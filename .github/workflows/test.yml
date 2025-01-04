@@ -1,0 +1,48 @@
+name: Pull Request Check # github actions 제목
+
+on: # 트리거- PR 이 열렸거나, 업데이트 되었을 때
+  pull_request:
+    types: [opened, synchronize]
+
+jobs: # 실제로 하게 되는 일
+  check: # 확인 (verify) 하게 된다.
+    runs-on: ubuntu-latest # 사용하는 테스팅 서버
+    permissions:
+      pull-requests: write # github actions 에 실제로 응답(작성) 할 수 있는 권한을 부여한다.
+
+    steps:
+      - uses: actions/github-script@v7 # 깃허브에서 제공하는 스크립트 사용
+        with:
+          script: | # 스크립트 사용 시작 
+            // 최상위 객체인 context 로부터 페이로드 내부 PR 객체 가져옴
+            const pullRequest = context.payload.pull_request; 
+
+            // 만약 PR 본문이 없다면, 스팸으로 인식.
+            if (!pullRequest) {
+              console.log("This is not a pull request.");
+              return; // 종료
+            }
+
+            // PR 객체 내부의 body 속성을 가져온다.
+            const body = pullRequest.body;
+            
+            // 만약 body 가 없다면 
+            if (!body || body.trim() === "") {
+              // PR에 코멘트 추가
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pullRequest.number,
+                body: "가이드라인 미준수로 인해 PR이 자동으로 닫힙니다. \n 가이드라인을 준수하여 PR 재요청 부탁드립니다!"
+              });
+
+              // PR 닫기
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullRequest.number,
+                state: "closed"
+              });
+
+              console.log("PR 에 body 가 없어 자동으로 닫습니다.");
+            }
