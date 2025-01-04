@@ -47,11 +47,20 @@ async function bootstrap() {
     .addBearerAuth(
       {
         type: 'http',
-        scheme: 'bearer',
+        scheme : 'Bearer',
         in: 'header',
         name: 'JWT',
       },
       'access_token',
+    )
+    .addCookieAuth(
+      'refresh-cookie',
+      {
+        type : "http",
+        scheme : "Bearer",
+        in : "cookie",
+      },
+      "refresh_token"
     )
     .build();
 

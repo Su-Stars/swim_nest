@@ -51,7 +51,7 @@ $ npm run test:cov
 
 ## GitHub 코드 관리 전략
 
-`code-management.md` 를 확인 해 주세요.
+`code-manage.md` 를 확인 해 주세요.
 
 ## Resources
 

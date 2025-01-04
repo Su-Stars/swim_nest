@@ -1,6 +1,3 @@
-# template-layout Issue 양식
-
-
 <!-- 작업 주제 or 제목을 적어주세요 --> 
 ## Issue 제목
 
