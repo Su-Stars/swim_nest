@@ -5,10 +5,8 @@ export class GetQueryData {
     region: string = 'all';
 
     @IsOptional()
-    @IsInt()
     page: number = 1;
 
     @IsOptional()
-    @IsInt()
     limit: number = 10;
 }
