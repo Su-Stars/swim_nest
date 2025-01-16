@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
+@Index("FT_search", ['name', 'address'], {fulltext: true})
 export class Pools{
     @PrimaryGeneratedColumn()
     id: number;
@@ -9,7 +10,6 @@ export class Pools{
     name: string;
 
     @Column()
-    @Index("region_search", {fulltext: true})
     address: string;
 
     @Column({nullable: true})
@@ -32,6 +32,33 @@ export class Pools{
 
     @Column({nullable: true})
     lane_info: string;
+
+    @Column({nullable: true})
+    depth_info: string;
+
+    @Column({nullable: true})
+    is_soap_provided: boolean;
+    
+    @Column({nullable: true})
+    is_towel_provided: boolean;
+    
+    @Column({nullable: true})
+    is_kickboard_allowed: boolean;
+    
+    @Column({nullable: true})
+    is_fins_allowed: boolean;
+    
+    @Column({nullable: true})
+    is_kickboard_rental: boolean;
+    
+    @Column({nullable: true})
+    is_diving_allowed: boolean;
+
+    @Column({nullable: true})
+    is_photo_allowed: boolean;
+
+    @Column('text', {nullable: true})
+    description: string;
 
     @CreateDateColumn()
     created_at: Date;
