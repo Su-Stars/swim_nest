@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Headers, HttpCode, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PoolsService } from './pools.service';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
+
 
 @Controller('api/v1/pools')
 export class PoolsController {
@@ -20,18 +21,44 @@ export class PoolsController {
     @Get('/:poolId')
     @HttpCode(200)
     getByIdPool(
-        @Param('poolId') poolId: number
+        @Param('poolId', ParseIntPipe) poolId: number
     ) {
         return this.poolsService.getByIdPool(poolId);
     }
 
+    
     // 관리자 수영장 추가
     @Post()
+    @UseInterceptors(ClassSerializerInterceptor)
+    @SerializeOptions({type: createPool})
     @HttpCode(200)
-    adminCreatePool(
-        @Body() body: createPool 
+    async adminCreatePool(
+        @Headers('authorization') token: string,
+        @Body() body: createPool
     ) {
-
+        return await this.poolsService.adminCreatePool(token, body)
     }
     
+    // 관리자 수영장 수정
+    @Patch('/:poolId')
+    @UseInterceptors(ClassSerializerInterceptor)
+    @SerializeOptions({type: createPool})
+    @HttpCode(200)
+    async adminUpdatePool (
+        @Headers('authorization') token: string,
+        @Body() body: createPool,
+        @Param('poolId', ParseIntPipe) poolId: number
+    ) {
+        return this.poolsService.adminUpdatePool(token, poolId, body)
+    }
+
+    // 관리자 수영장 삭제
+    @Delete('/:poolId')
+    @HttpCode(200)
+    async adminDeletePool (
+        @Headers('authorization') token: string,
+        @Param('poolId', ParseIntPipe) poolId: number
+    ) {
+        return await this.poolsService.adminDeletePool(token, poolId)
+    }
 }

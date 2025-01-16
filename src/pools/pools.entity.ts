@@ -37,25 +37,25 @@ export class Pools{
     depth_info: string;
 
     @Column({nullable: true})
-    is_Soap_Provided: boolean;
+    is_soap_provided: boolean;
     
     @Column({nullable: true})
-    is_Towel_Provided: boolean;
+    is_towel_provided: boolean;
     
     @Column({nullable: true})
-    is_Kickboard_Allowed: boolean;
+    is_kickboard_allowed: boolean;
     
     @Column({nullable: true})
-    is_Fins_Allowed: boolean;
+    is_fins_allowed: boolean;
     
     @Column({nullable: true})
-    is_Kickboard_Rental: boolean;
+    is_kickboard_rental: boolean;
     
     @Column({nullable: true})
-    is_Diving_Allowed: boolean;
+    is_diving_allowed: boolean;
 
     @Column({nullable: true})
-    is_Photo_Allowed: boolean;
+    is_photo_allowed: boolean;
 
     @Column('text', {nullable: true})
     description: string;
