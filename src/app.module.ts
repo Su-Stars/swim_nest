@@ -19,9 +19,9 @@ import { Images } from './images/images.entity';
       type: 'mysql',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_NAME,
-      password: process.env.DB_PW,
-      database: process.env.DB_DATEBASE,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       entities: [Pools, Images],
       synchronize: true
     }),

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,12 +13,17 @@ async function bootstrap() {
     origin: [
       'https://localhost:3000',
       'http://localhost:3000',
+      'http://nest-aws.site',
+      'https://nest-aws.site'
     ],
     // 앞으로 사용하게 될 메서드에 대한 허용.
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     // 민감한 정보도 담을 수 있다. - ex - Access-Control-Allow-Credential
     credentials: true,
   });
+
+  // 요청과 함께 기본적으로 내부 쿠키를 파싱해서 컨트롤러에 전달.
+  app.use(cookieParser());
 
   /*
   전역으로 선언되었기에, 모든 컨트롤러 라우트 핸들러에 적용되는 내용입니다.
@@ -70,6 +76,6 @@ async function bootstrap() {
   // 스웨거 문서는 "/api" 에서 볼 수 있습니다.
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(4000);
+  await app.listen(3000);
 }
 bootstrap();
