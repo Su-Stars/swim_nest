@@ -1,0 +1,43 @@
+name: main branch auto ci process script - 메인 브랜치로 CI/CD 하는 스크립트
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest # 깃허브 액션 환경
+    environment: REMOTE_SECRET_KEY # Environments 의 이름 지정
+
+    steps:
+      - name: SSH Private Key 사용하기 위해 .pem 파일 만들기
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.REMOTE_SECRET_KEY}}
+        run: |
+          echo "${SSH_PRIVATE_KEY}" > private_key.pem
+          chmod 600 private_key.pem 
+          cat private_key.pem
+
+      - name: remote ssh 명령 실행 and .env 환경설정 파일 생성
+        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
+        with:
+          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+          key: ${{secrets.REMOTE_SECRET_KEY}} # ec2 instance pem key
+          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+          script: | # 실행할 스크립트
+            cd /home/ec2-user/Swim_Nest # Project 로 이동
+            
+            echo "DB_HOST=${{ secrets.DB_HOST }}" > .env # .env (IPV4)
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env # 이어붙이기 (DB 유저이름) 
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env # 이어붙이기  (이 유저의 비밀번호 - 이걸 안바꾸면 털립니다)
+            echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env # mysql2
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env # 3306
+            echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env # swim_nest
+            git reset --hard HEAD
+            git pull --ff-only origin main
+            pm2 kill
+            npm i --legacy-peer-deps  
+            npm run build
+            pm2 start dist/main.js
