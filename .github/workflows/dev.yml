@@ -29,6 +29,10 @@ jobs:
           script: | # 실행할 스크립트
             cd /home/ec2-user/Swim_Nest # Project 로 이동
             
+            # JWT 시크릿
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}
+            
+            # DB 연동을 위한 환경변수 주입
             echo "DB_HOST=${{ secrets.DB_HOST }}" > .env # .env (IPV4)
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env # 이어붙이기 (DB 유저이름) 
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env # 이어붙이기  (이 유저의 비밀번호 - 이걸 안바꾸면 털립니다)
