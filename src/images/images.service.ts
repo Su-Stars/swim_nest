@@ -47,13 +47,30 @@ export class ImagesService {
 
         if (result.$metadata.httpStatusCode === 200) {
             const data = {
-                url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`,
-                d,
-                size: size,
-                mimetype: mimetype
+                url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/image-${placeId}${ext}`,
+                filename: `image-${placeId}${ext}`,
+                size,
+                mimetype
             }
             
-            console.log(await this.ImagesRepository.insert(data))
+            const { identifiers } = await this.ImagesRepository.insert(data)
+
+            const Result = await this.ImagesRepository.createQueryBuilder('images')
+                .select([
+                    'images.url AS imageUrl',
+                    'images.filename AS fileName',
+                    'images.size AS fileSize',
+                    'images.mimetype AS mimeType',
+                    'images.uploaded_at AS uploadedAt'
+                ])
+                .where('images.id = :id', {id: identifiers[0].id})
+                .getRawMany();
+                
+            return {
+                status: "success",
+                message: "이미지 업로드에 성공했습니다.",
+                data: Result
+            }
         }
     }
 

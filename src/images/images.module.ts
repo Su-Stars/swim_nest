@@ -4,11 +4,17 @@ import { ImagesService } from './images.service';
 import { Images } from './images.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
     imports: [
         ConfigModule,
-        TypeOrmModule.forFeature([Images])
+        TypeOrmModule.forFeature([Images]),
+        MulterModule.register({
+            limits: {
+                fileSize: 10 * 1024 * 1024
+            }
+        })
     ],
     controllers: [ImagesController],
     providers: [ImagesService]

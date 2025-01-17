@@ -12,7 +12,7 @@ export class Images {
     filename: string;
 
     @Column({name : "file_size"})
-    filesize: number;
+    size: number;
 
     @Column({name : "mime_type"})
     mimetype: string;
