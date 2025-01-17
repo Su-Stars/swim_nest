@@ -74,6 +74,6 @@ async function bootstrap() {
   // 스웨거 문서는 "/api" 에서 볼 수 있습니다.
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(4000);
+  await app.listen(3000);
 }
 bootstrap();
