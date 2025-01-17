@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
+import cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,9 @@ async function bootstrap() {
     // 민감한 정보도 담을 수 있다. - ex - Access-Control-Allow-Credential
     credentials: true,
   });
+
+  // 요청과 함께 기본적으로 내부 쿠키를 파싱해서 컨트롤러에 전달.
+  app.use(cookieParser());
 
   /*
   전역으로 선언되었기에, 모든 컨트롤러 라우트 핸들러에 적용되는 내용입니다.
