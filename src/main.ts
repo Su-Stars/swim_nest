@@ -13,6 +13,8 @@ async function bootstrap() {
     origin: [
       'https://localhost:3000',
       'http://localhost:3000',
+      'http://nest-aws.site',
+      'https://nest-aws.site'
     ],
     // 앞으로 사용하게 될 메서드에 대한 허용.
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
