@@ -8,7 +8,7 @@ export class AuthService {
     private jwtService : JwtService
   ) {}
 
-  async makeAccessToken(token : string) : Promise<ResponsePayloadDto> {
+  async makeAccessToken(token : string)  {
     const origin = token.replace("Bearer", "");
 
   }
