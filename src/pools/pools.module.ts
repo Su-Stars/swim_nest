@@ -7,6 +7,6 @@ import { Pools } from './pools.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Pools])],
   controllers: [PoolsController],
-  providers: [PoolsService]
+  providers: [PoolsService],
 })
 export class PoolsModule {}
