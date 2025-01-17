@@ -8,15 +8,15 @@ export class Images {
     @Column()
     url: string;
 
-    @Column()
-    file_name: string;
+    @Column({name : "file_name"})
+    filename: string;
 
-    @Column()
-    file_size: number;
+    @Column({name : "file_size"})
+    filesize: number;
 
-    @Column()
-    mime_type: string;
+    @Column({name : "mime_type"})
+    mimetype: string;
 
     @CreateDateColumn()
-    created_at: Date;
+    uploaded_at: Date;
 }

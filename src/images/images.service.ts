@@ -25,25 +25,38 @@ export class ImagesService {
     }
 
     async uploadImages (file: Express.Multer.File) {
-        const type = ['image/png', 'image/jpg', 'image/gif']
+        const { size, mimetype, buffer } = file;
+        const type = ['image/png', 'image/jpeg', 'image/gif']
         const ext = path.extname(file.originalname);
 
         // 임시 방편
         const placeId = Math.floor(Math.random()*10);
 
-        if (!type.some(i => i === file.mimetype)) {
+        if (!type.some(i => i === mimetype)) {
             throw new UnsupportedMediaTypeException("png, jpg, gif 파일이 아닙니다.");
         }
 
         const command = new PutObjectCommand({
             Bucket: this.configService.get('AWS_BUCKET_NAME'),
             Key: `image-${placeId}${ext}`,
-            Body: file.buffer,
+            Body: buffer,
             ContentType: `image/${ext}`
         })
 
-        const avv = await this.s3Client.send(command);
+        const result = await this.s3Client.send(command);
+
+        if (result.$metadata.httpStatusCode === 200) {
+            const data = {
+                url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`,
+                d,
+                size: size,
+                mimetype: mimetype
+            }
+            
+            console.log(await this.ImagesRepository.insert(data))
+        }
     }
 
     
 }
+
