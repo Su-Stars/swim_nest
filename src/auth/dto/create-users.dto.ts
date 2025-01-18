@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNumber, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUsersDto {
@@ -10,8 +10,13 @@ export class CreateUsersDto {
   @ApiProperty()
   password : string;
 
-  @IsString()
+  @IsOptional()
   @ApiProperty()
   username : string;
 
+  @IsOptional()
+  @ApiProperty({
+    description : "이미지 경로 - S3 경로"
+  })
+  image : string;
 }
