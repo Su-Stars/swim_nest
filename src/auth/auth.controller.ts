@@ -7,6 +7,7 @@ import { EmailVerificationDto } from "./dto/email-verification.dto";
 import { Response } from "express";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { LoginDto } from "./dto/login.dto";
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -14,7 +15,12 @@ export class AuthController {
 
   // 로그인
   @Post("login")
-  async login() {
+  @ApiBody({
+    type : LoginDto
+  })
+  async login(@Body() loginDto : LoginDto) {
+
+
     return {
       message : "아직 제작되지 않은 라우트입니다.",
     }
