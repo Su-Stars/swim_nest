@@ -5,6 +5,8 @@ import { UsersModule } from "../users/users.module";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./constants";
 import { ConfigModule } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Users } from "../users/users.entity";
 
 @Module({
   imports : [
@@ -13,7 +15,8 @@ import { ConfigModule } from "@nestjs/config";
       global : true,
       secret : jwtConstants.secret,
       signOptions : {expiresIn : '15m'}
-    })
+    }),
+    TypeOrmModule.forFeature([Users]),
   ],
   controllers : [AuthController],
   providers : [AuthService],
