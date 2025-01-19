@@ -24,6 +24,8 @@ import * as process from "node:process";
       database: process.env.DB_DATABASE,
       entities: [Pools, Users],
       synchronize: true,
+      charset : "utf8mb4",
+      timezone : "z"
     }),
     AppModule,
     UsersModule,

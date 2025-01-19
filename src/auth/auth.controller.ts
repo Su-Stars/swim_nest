@@ -13,25 +13,24 @@ import { LoginDto } from "./dto/login.dto";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // 로그인
+  // 로그인 - Express 로 Response 객체를 꺼냈으므로, 반드시 response.json() or end() 로 끝내야만 한다.
   @Post("login")
   @ApiBody({
     type : LoginDto
   })
-  async login(@Body() loginDto : LoginDto) {
-
-
-    return {
-      message : "아직 제작되지 않은 라우트입니다.",
-    }
+  async login(@Body() loginDto : LoginDto, @Res() response : Response) {
+    const result = await this.authService.login(loginDto, response);
+    return response.json(result);
   }
 
-  // 로그아웃
+  // 로그아웃 - 이것도 response.json() or end() 로 끝내야 한다.
   @Post("logout")
   async logout(@Res() response : Response) {
-    return {
-      message : "아직 제작되지 않은 라우트입니다.",
-    }
+    await this.authService.clearAuthCookies(response);
+
+    return response.json({
+      message : "로그아웃 되었습니다."
+    })
   }
 
   @Post("refresh-token")
@@ -49,9 +48,7 @@ export class AuthController {
   )
   @Post("register")
   async register(@Body() createUsersDto : CreateUsersDto) {
-    return {
-      message : "아직 제작되지 않은 라우트입니다.",
-    }
+    return await this.authService.register(createUsersDto);
   }
 
   // 비밀번호를 잊어버렸을 때 (이메일로 새 비밀번호 보내주기)

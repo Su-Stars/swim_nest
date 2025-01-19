@@ -5,7 +5,7 @@ import { CreateUsersDto } from "./dto/create-users.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../users/users.entity";
 import { Repository } from "typeorm";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import * as process from "node:process";
 import { LoginDto } from "./dto/login.dto";
 import { JwtPayload } from "./dto/jwt-payload";
@@ -17,11 +17,12 @@ export class AuthService {
     private jwtService : JwtService
   ) {}
 
+  // 회원가입 - 나중에 multipart/form-data 형식으로 오면 이미지 s3 버킷에 날려줘야함 - 추후 수정해야한다.
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
     const {email, password, nickname, description} = createUsersDto;
 
+    // 여기에 image 서비스 넣을 예정.
 
-    // 여기에 필요하다면 image 서비스.
 
     // 환경변수에서 salt 몇 번 돌려서 암호화 할 건지 가져옴.
     const saltRound = parseInt(process.env.SALT_ROUND);
@@ -36,13 +37,16 @@ export class AuthService {
     const newUsers = this.usersRepository.create({
       email : email,
       password : hashPassword,
-      nickname : nickname || "새로운 사용자",
+      nickname : nickname,
       description : description,
       salt : salt,
     });
 
-    // DB 저장과 동시에 해당 엔티티 반환
-    return await this.usersRepository.save(newUsers);
+    // 저장 후 저장된 엔티티 반환
+    const userInfo = await this.usersRepository.save(newUsers);
+
+    // 비밀번호 빼고 반환
+    return await this.exceptPwd(userInfo);
   }
 
   async login(loginDto : LoginDto, response : Response) {
@@ -56,14 +60,15 @@ export class AuthService {
     // 만약 이메일이 존재하지 않을 경우 바로 에러 던지기.
     if(!loginUsers) {
       throw new HttpException({
-        message : "해당 이메일을 가진 계정이 존재하지 않습니다."
+        message : "해당 계정이 존재하지 않습니다."
       }, HttpStatus.BAD_REQUEST)
     }
 
     // 데이터베이스에는 비밀번호가 해싱되어 있음.
     const dbPassword = loginUsers.password;
+    const hashedPassword = await bcrypt.hash(password, loginUsers.salt);
 
-    const loginSuccess = await bcrypt.compare(password, dbPassword);
+    const loginSuccess = dbPassword === hashedPassword;
 
     // 비밀번호가 틀림.
     if(!loginSuccess) {
@@ -72,18 +77,24 @@ export class AuthService {
       }, HttpStatus.UNAUTHORIZED);
     }
 
-    const {accessToken, refreshToken} = await this.generateAllTokens({
+    const result = {
       id : loginUsers.id,
       email : email,
       nickname : loginUsers.nickname,
       role : loginUsers.role
-    })
+    }
 
+    const {accessToken, refreshToken} = await this.generateAllTokens(result);
+
+    await this.usersRepository.update({ id : loginUsers.id}, {refresh_token : refreshToken});
+
+    // 응답 객체에 쿠키로 2 개 심기 - 액세스, 리프레쉬
     await this.setAuthCookies(response, {accessToken, refreshToken});
 
     return {
       message : "로그인 성공했습니다.",
       status : "success",
+      data : result,
     }
   }
 
@@ -125,17 +136,15 @@ export class AuthService {
   // 생성된 두 개의 쿠키(access, refresh) 를 설정 - access 만 주거나, refresh 둘 다 주거나
   async setAuthCookies(
     response: Response,
-    tokens: { accessToken: string; refreshToken: string | undefined },
+    tokens: { accessToken: string; refreshToken?: string },
   ) : Promise<void> {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      sameSite: 'strict',
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
     response.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
       maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
     });
   }
@@ -184,4 +193,10 @@ export class AuthService {
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  private async exceptPwd(user) {
+    const {password, salt,  ...userInfo} = user;
+    return userInfo;
+  }
 }
+
