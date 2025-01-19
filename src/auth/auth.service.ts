@@ -143,10 +143,14 @@ export class AuthService {
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
-    response.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
-    });
+
+    if(tokens.refreshToken){
+      response.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
+      });
+
+    }
   }
 
   // 로그아웃이므로 access, refresh 둘 다 삭제
@@ -192,6 +196,18 @@ export class AuthService {
         error : error,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async verificationEmail(email : string) : Promise<boolean> {
+    const getUser = this.usersRepository.findOneBy({
+      email : email
+    })
+
+    return getUser ? true : false;
+  }
+
+  async resetPassword(password : string) {
+
   }
 
   private async exceptPwd(user) {
