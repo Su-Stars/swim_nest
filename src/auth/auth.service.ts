@@ -5,7 +5,7 @@ import { CreateUsersDto } from "./dto/create-users.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../users/users.entity";
 import { Repository } from "typeorm";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import * as process from "node:process";
 import { LoginDto } from "./dto/login.dto";
 import { JwtPayload } from "./dto/jwt-payload";
