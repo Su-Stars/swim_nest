@@ -9,25 +9,27 @@ import { PoolsModule } from './pools/pools.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pools } from './pools/pools.entity';
+import { Users } from "./users/users.entity";
+import * as process from "node:process";
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal : true}),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: process.env.DB_TYPE as "mysql",
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools],
-      synchronize: true
+      entities: [Pools, Users],
+      synchronize: true,
     }),
     AppModule,
     UsersModule,
     AuthModule,
     PoolsModule],
   controllers: [AppController],
-  providers: [AppService, UsersService, AuthService],
+  providers: [AppService],
 })
 export class AppModule {}

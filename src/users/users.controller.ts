@@ -14,7 +14,7 @@ export class UsersController {
   }
 
   // 본인의 정보 수정
-  @Patch()
+  @Patch("/me")
   async patchAccount() {
     return {
       message : "아직 제작되지 않은 라우트입니다.",
