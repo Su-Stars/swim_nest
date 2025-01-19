@@ -31,6 +31,10 @@ jobs:
             
             # JWT 시크릿
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+            echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env
+            
+            # SALT 라운드 횟수
+            echo "SALT_ROUND=${{ secrets.SALT_ROUND }}" >> .env
             
             # DB 연동을 위한 환경변수 주입
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env # .env (IPV4)
