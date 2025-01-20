@@ -143,10 +143,14 @@ export class AuthService {
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
-    response.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
-    });
+
+    if(tokens.refreshToken){
+      response.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
+      });
+
+    }
   }
 
   // 로그아웃이므로 access, refresh 둘 다 삭제
@@ -194,9 +198,51 @@ export class AuthService {
     }
   }
 
-  private async exceptPwd(user) {
+  async verificationEmail(email : string) : Promise<boolean> {
+    const getUser = this.usersRepository.findOneBy({
+      email : email
+    })
+
+    return getUser ? true : false;
+  }
+
+  async resetPassword(password : string, newPassword : string, userId : number) {
+    const users = await this.usersRepository.findOneBy({id : userId});
+
+    const isValidPwd = this.checkPwd(users, password);
+
+    if(!isValidPwd) {
+      throw new HttpException(
+        {
+          message : "주어진 비밀번호가 일치하지 않습니다."
+        },
+        HttpStatus.BAD_REQUEST
+      )
+    }
+
+    const salt = users.salt;
+
+    const hashedPassword = bcrypt.hashSync(newPassword, salt);
+
+    return await this.usersRepository.update({
+      id : userId,
+    }, {
+      password : hashedPassword
+    })
+  }
+
+  // 어떠한 유저 형태의 객체이던, 패스워드와 salt 빼고 다시 되돌려줌 (보안을 위함.)
+  private async exceptPwd(user : any) {
     const {password, salt,  ...userInfo} = user;
     return userInfo;
+  }
+
+  private async checkPwd(users : Users, password : string) : Promise<boolean> {
+    const salt = users.salt;
+
+    const hashedPwd = bcrypt.hashSync(password, salt);
+
+    return users.password === hashedPwd;
   }
 }
 
