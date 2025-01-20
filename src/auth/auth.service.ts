@@ -206,13 +206,43 @@ export class AuthService {
     return getUser ? true : false;
   }
 
-  async resetPassword(password : string) {
+  async resetPassword(password : string, newPassword : string, userId : number) {
+    const users = await this.usersRepository.findOneBy({id : userId});
 
+    const isValidPwd = this.checkPwd(users, password);
+
+    if(!isValidPwd) {
+      throw new HttpException(
+        {
+          message : "주어진 비밀번호가 일치하지 않습니다."
+        },
+        HttpStatus.BAD_REQUEST
+      )
+    }
+
+    const salt = users.salt;
+
+    const hashedPassword = bcrypt.hashSync(newPassword, salt);
+
+    return await this.usersRepository.update({
+      id : userId,
+    }, {
+      password : hashedPassword
+    })
   }
 
-  private async exceptPwd(user) {
+  // 어떠한 유저 형태의 객체이던, 패스워드와 salt 빼고 다시 되돌려줌 (보안을 위함.)
+  private async exceptPwd(user : any) {
     const {password, salt,  ...userInfo} = user;
     return userInfo;
+  }
+
+  private async checkPwd(users : Users, password : string) : Promise<boolean> {
+    const salt = users.salt;
+
+    const hashedPwd = bcrypt.hashSync(password, salt);
+
+    return users.password === hashedPwd;
   }
 }
 

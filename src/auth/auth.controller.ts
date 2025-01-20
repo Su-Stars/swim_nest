@@ -59,7 +59,7 @@ export class AuthController {
   })
   async forgotPassword(@Body() forgotPasswordDto : ForgotPasswordDto) {
     return {
-      message : "아직 제작되지 않은 라우트입니다.",
+      message : "NodeMailer 를 통해 만들어야 되는 핸들러입니다. (아직 미제작)",
     }
   }
 
@@ -68,13 +68,15 @@ export class AuthController {
   @ApiBody({
     type : ResetPasswordDto
   })
-  async resetPassword(@Body() resetPasswordDto : ResetPasswordDto, @Res() response : Response ) {
-    const {password} = resetPasswordDto;
+  async resetPassword(@Body() resetPasswordDto : ResetPasswordDto, @Req() req : Request ) {
+    const {password, newPassword} = resetPasswordDto;
 
-    await this.authService.resetPassword(password);
+    const {id} = req["user"];
+
+    await this.authService.resetPassword(password, newPassword, parseInt(id));
 
     return {
-      message : "아직 제작되지 않은 라우트입니다.",
+      message : "비밀번호 변경이 완료 되었습니다.",
     }
   }
 
