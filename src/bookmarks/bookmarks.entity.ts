@@ -15,7 +15,9 @@ export class Bookmarks {
   })
   users : Users;
 
-  @ManyToOne(() => Pools, (pools) => pools.bookmarks)
+  @ManyToOne(() => Pools, (pools) => pools.bookmarks, {
+    onDelete : "CASCADE"
+  })
   @JoinColumn({
     name : "pool_id"
   })

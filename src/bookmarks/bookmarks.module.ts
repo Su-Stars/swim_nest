@@ -1,4 +1,13 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Bookmarks } from "./bookmarks.entity";
+import { BookmarksService } from "./bookmarks.service";
 
-@Module({})
+@Module({
+  imports : [
+    TypeOrmModule.forFeature([Bookmarks]),
+  ],
+  providers : [BookmarksService],
+  exports : [BookmarksService]
+})
 export class BookmarksModule {}
