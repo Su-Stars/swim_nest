@@ -25,7 +25,6 @@ import * as process from "node:process";
       entities: [Pools, Users],
       synchronize: true,
       charset : "utf8mb4",
-      timezone : "z"
     }),
     AppModule,
     UsersModule,
