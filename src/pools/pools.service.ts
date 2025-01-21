@@ -15,8 +15,8 @@ export class PoolsService {
     ) {}
 
     // Pool 전체 조회
-    async getAllPools(Query: GetQueryData): Promise<any> {
-        const {page, limit, region, keyword} = Query;
+    async getAllPools(query: GetQueryData): Promise<any> {
+        const {page, limit, region, keyword} = query;
         
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
@@ -166,4 +166,4 @@ export class PoolsService {
             }
         }
     }
-}
+}   
