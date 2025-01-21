@@ -5,4 +5,8 @@ export class ResetPasswordDto {
   @IsString()
   @ApiProperty()
   password : string;
+
+  @IsString()
+  @ApiProperty()
+  newPassword : string;
 }
