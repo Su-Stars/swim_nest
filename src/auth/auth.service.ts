@@ -140,7 +140,7 @@ export class AuthService {
   // 생성된 두 개의 쿠키(access, refresh) 를 설정 - access 만 주거나, refresh 둘 다 주거나
   async setAuthCookies(
     response: Response,
-    tokens: { accessToken: string; refreshToken?: string },
+    tokens: { accessToken: string; refreshToken?: string | undefined },
   ) : Promise<void> {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
@@ -171,9 +171,9 @@ export class AuthService {
   }
 
   // access-token 검증 - Middleware 에서 사용 예정
-  async validateAccessToken(token: string) : Promise<JwtPayload> {
+  async validateAccessToken(token: string) {
     if (!token || typeof token !== 'string') {
-      throw new Error("유효하지 않은 토큰 형식입니다.");
+      return new HttpException("유효하지 않은 토큰 형식입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     token = token.replace("Bearer ", "");
@@ -183,7 +183,7 @@ export class AuthService {
         secret: process.env.JWT_SECRET,
       });
     } catch (error) {
-      throw new HttpException({
+      return new HttpException({
         message : "access 토큰이 만료되었습니다.",
         error : error,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -191,7 +191,11 @@ export class AuthService {
   }
 
   // Refresh token 검증 - Middleware 에서 사용 예정
-  async validateRefreshToken(token: string) : Promise<JwtPayload> {
+  async validateRefreshToken(token: string) {
+    if (!token || typeof token !== 'string') {
+      return new HttpException("유효하지 않은 토큰 형식입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     token = token.replace("Bearer ", "");
 
     try {
@@ -199,7 +203,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET,
       });
     } catch (error) {
-      throw new HttpException({
+      return new HttpException({
         message : "access_token 검증 중 실패",
         error : error,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
