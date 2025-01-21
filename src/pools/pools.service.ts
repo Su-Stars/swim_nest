@@ -104,8 +104,8 @@ export class PoolsService {
     }
 
     // 관리자 Pool 추가
-    async adminCreatePool(Req: Request, body: createPool) {
-        const {role} : JwtPayload = Req["user"]
+    async adminCreatePool(req: Request, body: createPool) {
+        const {role} : JwtPayload = req["user"]
         
         if (role === 'user') {
             throw new ForbiddenException({
@@ -123,8 +123,8 @@ export class PoolsService {
     }
 
     // 관리자 pool 수정
-    async adminUpdatePool (Req: Request, poolId: number, body: createPool) {
-        const {role} : JwtPayload = Req["user"]
+    async adminUpdatePool (req: Request, poolId: number, body: createPool) {
+        const {role} : JwtPayload = req["user"]
 
         if (role === 'user') {
             throw new ForbiddenException({
@@ -146,8 +146,8 @@ export class PoolsService {
     }
 
     // 관리자 Pool 삭제
-    async adminDeletePool(Req: Request, poolId: number) {
-        const {role} : JwtPayload = Req["user"]
+    async adminDeletePool(req: Request, poolId: number) {
+        const {role} : JwtPayload = req["user"]
 
         if (role === 'user') {
             throw new ForbiddenException({

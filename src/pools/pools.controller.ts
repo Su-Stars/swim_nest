@@ -32,46 +32,31 @@ export class PoolsController {
     @Post()
     @HttpCode(200)
     async adminCreatePool(
-        @Req() Req: Request,
+        @Req() req: Request,
         @Body() body: createPool
     ) {
-        if (Req["user"]) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
-        return await this.poolsService.adminCreatePool(Req, body)
+        return await this.poolsService.adminCreatePool(req, body)
     }
     
     // 관리자 수영장 수정
     @Patch('/:poolId')
     @HttpCode(200)
     async adminUpdatePool (
-        @Req() Req: Request,
+        @Req() req: Request,
         @Body() body: createPool,
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
-        if (Req["user"]) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
-        return this.poolsService.adminUpdatePool(Req, poolId, body)
+        return this.poolsService.adminUpdatePool(req, poolId, body)
     }
 
     // 관리자 수영장 삭제
     @Delete('/:poolId')
     @HttpCode(200)
     async adminDeletePool (
-        @Req() Req: Request,
+        @Req() req: Request,
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
-        if (Req["user"]) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
-        return await this.poolsService.adminDeletePool(Req, poolId)
+        return await this.poolsService.adminDeletePool(req, poolId)
     }
 }
 
