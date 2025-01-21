@@ -36,6 +36,6 @@ import * as process from "node:process";
     BookmarksModule
   ],
   controllers: [AppController],
-  providers: [AppService, BookmarksService],
+  providers: [AppService],
 })
 export class AppModule {}
