@@ -18,9 +18,6 @@ export class AuthMiddleware implements NestMiddleware {
     const accessToken = req.cookies["access_token"]
     const refreshToken = req.cookies["refresh_token"]
 
-    console.log(accessToken);
-    console.log(refreshToken);
-
     const accessOrErr = await this.authService.validateAccessToken(accessToken);
 
     const refreshOrErr = await this.authService.validateRefreshToken(refreshToken);
