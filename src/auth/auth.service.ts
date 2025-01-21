@@ -140,7 +140,7 @@ export class AuthService {
   // 생성된 두 개의 쿠키(access, refresh) 를 설정 - access 만 주거나, refresh 둘 다 주거나
   async setAuthCookies(
     response: Response,
-    tokens: { accessToken: string; refreshToken?: string },
+    tokens: { accessToken: string; refreshToken?: string | undefined },
   ) : Promise<void> {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,

@@ -36,7 +36,10 @@ export class AuthMiddleware implements NestMiddleware {
         console.log(newAccessToken)
 
         // 결과적으로 리프레쉬 토큰으로 액세스 토큰을 새로 발급한 것이다.
-        res.cookie("access_token", newAccessToken.accessToken);
+        res.cookie("access_token", newAccessToken.accessToken, {
+          httpOnly : true,
+          maxAge : 1 * 24 * 60 * 60 * 1000, // 하루
+        });
 
         req["user"] = await this.authService.validateAccessToken(accessToken);
 
