@@ -19,7 +19,7 @@ export class AuthService {
 
   // 회원가입 - 나중에 multipart/form-data 형식으로 오면 이미지 s3 버킷에 날려줘야함 - 추후 수정해야한다.
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
-    const {email, password, nickname, description} = createUsersDto;
+    const {email, password, nickname, role, description} = createUsersDto;
 
     // 여기에 image 서비스 넣을 예정.
 
@@ -228,7 +228,7 @@ export class AuthService {
       id : userId,
     }, {
       password : hashedPassword
-    })
+    });
   }
 
   // 어떠한 유저 형태의 객체이던, 패스워드와 salt 빼고 다시 되돌려줌 (보안을 위함.)
