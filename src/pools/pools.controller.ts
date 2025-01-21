@@ -29,8 +29,6 @@ export class PoolsController {
     
     // 관리자 수영장 추가
     @Post()
-    @UseInterceptors(ClassSerializerInterceptor)
-    @SerializeOptions({type: createPool})
     @HttpCode(200)
     async adminCreatePool(
         @Headers('authorization') token: string,
@@ -41,8 +39,6 @@ export class PoolsController {
     
     // 관리자 수영장 수정
     @Patch('/:poolId')
-    @UseInterceptors(ClassSerializerInterceptor)
-    @SerializeOptions({type: createPool})
     @HttpCode(200)
     async adminUpdatePool (
         @Headers('authorization') token: string,

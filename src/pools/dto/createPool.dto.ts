@@ -1,4 +1,3 @@
-import { Expose } from "class-transformer";
 import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
 
 export class createPool {
@@ -18,55 +17,44 @@ export class createPool {
     images: string;
 
     @IsOptional()
-    @Expose({name: "freeSwimLink"})
-    free_swim_link: string;
+    freeSwimLink: string;
 
     @IsOptional()
-    @Expose({name: "swimLessonLink"})
-    swim_lesson_link: string;
+    swimLessonLink: string;
 
     @IsOptional()
-    @Expose({name: "laneInfo"})
-    lane_info: string;
+    laneInfo: string;
 
     @IsOptional()
-    @Expose({name: "depthInfo"})
-    depth_info: string;
+    depthInfo: string;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isSoapProvided"})
-    is_soap_provided: boolean;
+    isSoapProvided: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isTowelProvided"})
-    is_towel_provided: boolean;
+    isTowelProvided: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isKickboardAllowed"})
-    is_kickboard_allowed: boolean;
+    isKickboardAllowed: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isFinsAllowed"})
-    is_fins_allowed: boolean;
+    isFinsAllowed: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isKickboardRental"})
-    is_kickboard_rental: boolean;
+    isKickboardRental: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isDivingAllowed"})
-    is_diving_allowed: boolean;
+    isDivingAllowed: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isPhotoAllowed"})
-    is_photo_allowed: boolean;
+    isPhotoAllowed: boolean;
 
     @IsOptional()
     description: string;

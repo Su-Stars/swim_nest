@@ -74,17 +74,17 @@ export class PoolsService {
                     'pool.website',
                     'pool.latitude',
                     'pool.longtitude',
-                    'pool.free_swim_link AS freeSwimLink',
-                    'pool.swim_lesson_link AS swimLessonLink',
-                    'pool.lane_info AS laneInfo',
-                    'pool.depth_info AS depthInfo',
-                    'pool.is_soap_provided AS isSoapProvided',
-                    'pool.is_towel_provided AS isTowelProvided',
-                    'pool.is_kickboard_allowed AS isKickboardAllowed',
-                    'pool.is_fins_allowed AS isFinsAllowed',
-                    'pool.is_kickboard_rental AS isKickboardRental',
-                    'pool.is_diving_allowed AS isDivingAllowed',
-                    'pool.is_photo_allowed AS isPhotoAllowed'
+                    'pool.freeSwimLink',
+                    'pool.swimLessonLink',
+                    'pool.laneInfo',
+                    'pool.depthInfo',
+                    'pool.isSoapProvided',
+                    'pool.isTowelProvided',
+                    'pool.isKickboardAllowed',
+                    'pool.isFinsAllowed',
+                    'pool.isKickboardRental',
+                    'pool.isDivingAllowed',
+                    'pool.isPhotoAllowed'
                     ])
             .where('pool.id = :id', { id: poolId})
             .getMany();
