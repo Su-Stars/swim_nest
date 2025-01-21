@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Bookmarks } from "../bookmarks/bookmarks.entity";
 
 @Entity()
 @Index("FT_search", ['name', 'address'], {fulltext: true})
@@ -65,4 +66,8 @@ export class Pools{
 
     @UpdateDateColumn()
     updated_at: Date;
+
+    // Pools 를 참조하는 테이블을 위한 릴레이션
+    @OneToMany(() => Bookmarks, (bookmark) => bookmark.pools)
+    bookmarks : Bookmarks[];
 }
