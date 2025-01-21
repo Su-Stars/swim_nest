@@ -18,6 +18,9 @@ export class AuthMiddleware implements NestMiddleware {
     const accessToken = req.cookies["access_token"]
     const refreshToken = req.cookies["refresh_token"]
 
+    console.log(accessToken);
+    console.log(refreshToken);
+
     try{
       if(accessToken && typeof accessToken === 'string') { // access 토큰이 만료되지 않았다면, 쿠키로서 전해져 온 것이다.
 
@@ -28,12 +31,12 @@ export class AuthMiddleware implements NestMiddleware {
         const tokenPayload = await this.authService.validateRefreshToken(refreshToken);
 
         // 새로운 액세스 토큰 발급
-        const newAccessToken = await this.authService.generateAccessToken(tokenPayload)
+        const newAccessToken = await this.authService.generateAccessToken(tokenPayload);
 
         console.log(newAccessToken)
 
         // 결과적으로 리프레쉬 토큰으로 액세스 토큰을 새로 발급한 것이다.
-        res.cookie("access_token", newAccessToken);
+        res.cookie("access_token", newAccessToken.accessToken);
 
         req["user"] = await this.authService.validateAccessToken(accessToken);
 
@@ -44,8 +47,6 @@ export class AuthMiddleware implements NestMiddleware {
           message : "모든 토큰(access, refresh) 이 소진되어 로그인 해야합니다."
         }, HttpStatus.UNAUTHORIZED)
       }
-
-      console.log(req["user"]);
 
       // 권한 인증이 완료되었으니, 그 다음 핸들러로 이동한다.
       next();
