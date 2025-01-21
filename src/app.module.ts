@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pools } from './pools/pools.entity';
 import { Users } from "./users/users.entity";
+import { BookmarksService } from './bookmarks/bookmarks.service';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 import * as process from "node:process";
 
 @Module({
@@ -29,9 +31,10 @@ import * as process from "node:process";
     AppModule,
     UsersModule,
     AuthModule,
-    PoolsModule
+    PoolsModule,
+    BookmarksModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, BookmarksService],
 })
 export class AppModule {}
