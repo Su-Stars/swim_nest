@@ -1,13 +1,24 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Bookmarks } from "./bookmarks.entity";
 import { BookmarksService } from "./bookmarks.service";
+import { BookmarksController } from './bookmarks.controller';
+import { AuthMiddleware } from "../common/middleware/auth.middleware";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports : [
+  imports: [
     TypeOrmModule.forFeature([Bookmarks]),
+    AuthModule
   ],
-  providers : [BookmarksService],
-  exports : [BookmarksService]
+  controllers: [BookmarksController],
+  providers: [BookmarksService],
+  exports: [BookmarksService, TypeOrmModule],
 })
-export class BookmarksModule {}
+export class BookmarksModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(BookmarksController)
+  }
+}
