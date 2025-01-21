@@ -39,6 +39,7 @@ export class AuthService {
       password : hashPassword,
       nickname : nickname,
       description : description,
+      role : role,
       salt : salt,
     });
 
@@ -104,12 +105,14 @@ export class AuthService {
     accessToken : string,
     refreshToken : string,
   }> {
-    const accessToken = await this.jwtService.signAsync(payload, {
+    const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
+
+    const accessToken = await this.jwtService.signAsync(restPayload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '5m', // 5 분마다 액세스 토큰 재발급
     });
 
-    const refreshToken = await this.jwtService.signAsync(payload, {
+    const refreshToken = await this.jwtService.signAsync(restPayload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '1d', // 하루에 한 번씩 리프레쉬 토큰 발급
     });
@@ -124,8 +127,9 @@ export class AuthService {
   async generateAccessToken(payload : Record<string, any>) : Promise<{
     accessToken : string;
   }> {
+    const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
 
-    const accessToken = this.jwtService.sign(payload, {
+    const accessToken = this.jwtService.sign(restPayload, {
       secret : process.env.JWT_SECRET,
       expiresIn : "5m",
     })
