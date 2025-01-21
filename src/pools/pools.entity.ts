@@ -60,33 +60,6 @@ export class Pools{
     @Column('text', {nullable: true})
     description: string;
 
-    @Column({nullable: true})
-    depth_info: string;
-
-    @Column({nullable: true})
-    is_soap_provided: boolean;
-
-    @Column({nullable: true})
-    is_towel_provided: boolean;
-
-    @Column({nullable: true})
-    is_kickboard_allowed: boolean;
-
-    @Column({nullable: true})
-    is_fins_allowed: boolean;
-
-    @Column({nullable: true})
-    is_kickboard_rental: boolean;
-
-    @Column({nullable: true})
-    is_diving_allowed: boolean;
-
-    @Column({nullable: true})
-    is_photo_allowed: boolean;
-
-    @Column('text', {nullable: true})
-    description: string;
-
     @CreateDateColumn()
     created_at: Date;
 

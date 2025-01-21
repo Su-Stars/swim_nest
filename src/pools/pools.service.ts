@@ -1,9 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
+import { Request } from 'express';
+import { JwtPayload } from 'src/auth/dto/jwt-payload';
 
 @Injectable()
 export class PoolsService {
@@ -102,18 +104,14 @@ export class PoolsService {
     }
 
     // 관리자 Pool 추가
-    async adminCreatePool(token: string, body: createPool) {
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
+    async adminCreatePool(Req: Request, body: createPool) {
+        const {role} : JwtPayload = Req["user"]
         
-        if (token === 'user') {
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const {id} = await this.PoolsRepository.save(body);
 
             return {
@@ -125,18 +123,14 @@ export class PoolsService {
     }
 
     // 관리자 pool 수정
-    async adminUpdatePool (token: string, poolId: number, body: createPool) {
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
+    async adminUpdatePool (Req: Request, poolId: number, body: createPool) {
+        const {role} : JwtPayload = Req["user"]
 
-        if (token === 'user') {
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0) {
                 throw new NotFoundException();
@@ -152,19 +146,14 @@ export class PoolsService {
     }
 
     // 관리자 Pool 삭제
-    async adminDeletePool(token: string, poolId: number) {
-        
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
-        
-        if (token === 'user') {
+    async adminDeletePool(Req: Request, poolId: number) {
+        const {role} : JwtPayload = Req["user"]
+
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0){
                 throw new NotFoundException();

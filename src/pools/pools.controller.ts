@@ -1,7 +1,8 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Headers, HttpCode, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Headers, HttpCode, Param, ParseIntPipe, Patch, Post, Query, Req, SerializeOptions, UnauthorizedException, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PoolsService } from './pools.service';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
+import { Request } from 'express';
 
 
 @Controller('api/v1/pools')
@@ -31,30 +32,46 @@ export class PoolsController {
     @Post()
     @HttpCode(200)
     async adminCreatePool(
-        @Headers('authorization') token: string,
+        @Req() Req: Request,
         @Body() body: createPool
     ) {
-        return await this.poolsService.adminCreatePool(token, body)
+        if (Req["user"]) {
+            throw new UnauthorizedException({
+                message: "토큰이 존재하지 않습니다."
+            })
+        }
+        return await this.poolsService.adminCreatePool(Req, body)
     }
     
     // 관리자 수영장 수정
     @Patch('/:poolId')
     @HttpCode(200)
     async adminUpdatePool (
-        @Headers('authorization') token: string,
+        @Req() Req: Request,
         @Body() body: createPool,
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
-        return this.poolsService.adminUpdatePool(token, poolId, body)
+        if (Req["user"]) {
+            throw new UnauthorizedException({
+                message: "토큰이 존재하지 않습니다."
+            })
+        }
+        return this.poolsService.adminUpdatePool(Req, poolId, body)
     }
 
     // 관리자 수영장 삭제
     @Delete('/:poolId')
     @HttpCode(200)
     async adminDeletePool (
-        @Headers('authorization') token: string,
+        @Req() Req: Request,
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
-        return await this.poolsService.adminDeletePool(token, poolId)
+        if (Req["user"]) {
+            throw new UnauthorizedException({
+                message: "토큰이 존재하지 않습니다."
+            })
+        }
+        return await this.poolsService.adminDeletePool(Req, poolId)
     }
 }
+

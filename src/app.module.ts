@@ -32,8 +32,7 @@ import { Images } from './images/images.entity';
     AppModule,
     UsersModule,
     AuthModule,
-    PoolsModule
-  ,
+    PoolsModule,
     ImagesModule],
   controllers: [AppController],
   providers: [AppService],
