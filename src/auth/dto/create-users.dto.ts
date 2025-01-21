@@ -14,6 +14,10 @@ export class CreateUsersDto {
   @ApiProperty()
   nickname : string;
 
+  @IsString()
+  @IsOptional()
+  role : string;
+
   @IsOptional()
   @ApiProperty()
   description : string;

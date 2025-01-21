@@ -19,7 +19,7 @@ export class AuthService {
 
   // 회원가입 - 나중에 multipart/form-data 형식으로 오면 이미지 s3 버킷에 날려줘야함 - 추후 수정해야한다.
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
-    const {email, password, nickname, description} = createUsersDto;
+    const {email, password, nickname, role, description} = createUsersDto;
 
     // 여기에 image 서비스 넣을 예정.
 
@@ -39,6 +39,7 @@ export class AuthService {
       password : hashPassword,
       nickname : nickname,
       description : description,
+      role : role,
       salt : salt,
     });
 
@@ -104,12 +105,14 @@ export class AuthService {
     accessToken : string,
     refreshToken : string,
   }> {
-    const accessToken = await this.jwtService.signAsync(payload, {
+    const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
+
+    const accessToken = await this.jwtService.signAsync(restPayload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '5m', // 5 분마다 액세스 토큰 재발급
     });
 
-    const refreshToken = await this.jwtService.signAsync(payload, {
+    const refreshToken = await this.jwtService.signAsync(restPayload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '1d', // 하루에 한 번씩 리프레쉬 토큰 발급
     });
@@ -124,8 +127,9 @@ export class AuthService {
   async generateAccessToken(payload : Record<string, any>) : Promise<{
     accessToken : string;
   }> {
+    const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
 
-    const accessToken = this.jwtService.sign(payload, {
+    const accessToken = this.jwtService.sign(restPayload, {
       secret : process.env.JWT_SECRET,
       expiresIn : "5m",
     })
@@ -228,7 +232,7 @@ export class AuthService {
       id : userId,
     }, {
       password : hashedPassword
-    })
+    });
   }
 
   // 어떠한 유저 형태의 객체이던, 패스워드와 salt 빼고 다시 되돌려줌 (보안을 위함.)

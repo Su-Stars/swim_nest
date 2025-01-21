@@ -30,7 +30,8 @@ import * as process from "node:process";
     AppModule,
     UsersModule,
     AuthModule,
-    PoolsModule],
+    PoolsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
