@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req } from "@nestjs/common";
 import { Request } from "express";
 import { SwimLogQueryDto } from "./dto/swimLogQuery.dto";
 import { ApiBody, ApiCookieAuth, ApiQuery, ApiResponse } from "@nestjs/swagger";
@@ -95,6 +95,21 @@ export class SwimLogsController {
         totalSwimLength : totalSwimLength,
         records : groupByDate
       }
+    }
+  }
+
+  @Get(":log_id")
+  async getMyLog(@Param("log_id", ParseIntPipe) log_id : number, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    const swim_log = await this.swimLogsService.getMyLog(id, log_id);
+
+    return {
+      status : "success",
+      message : "나의 특정 수영활동 기록 조회 성공!",
+      data : swim_log
     }
   }
 }

@@ -56,4 +56,30 @@ export class SwimLogsService {
 
     return resultLogList;
   }
+
+  async getMyLog(user_id : number, log_id : number) {
+
+    const swimLog = await this.swimLogsRepository.findOneBy({
+      id : log_id,
+      user_id : user_id
+    });
+
+    // 수영 기록이 없다면,
+    if(!swimLog) {
+      throw new HttpException({
+        status : "error",
+        message : "해당 수영 기록이 존재하지 않습니다."
+      }, HttpStatus.NOT_FOUND);
+    }
+
+    // 유저 아이디는 딱히 필요 없음
+    delete swimLog.user_id
+
+    const returnLog = {
+      ...swimLog,
+      swim_date : `${swimLog.swim_date.getFullYear()}-${String(swimLog.swim_date.getMonth() + 1).padStart(2, '0')}-${String(swimLog.swim_date.getDate()).padStart(2, '0')}`
+    }
+
+    return returnLog;
+  }
 }
