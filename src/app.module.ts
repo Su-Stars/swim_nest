@@ -10,6 +10,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pools } from './pools/pools.entity';
 import { Users } from "./users/users.entity";
+import { Bookmarks } from "./bookmarks/bookmarks.entity";
+import { BookmarksService } from './bookmarks/bookmarks.service';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 import * as process from "node:process";
 import { ImagesModule } from './images/images.module';
 import { Images } from './images/images.entity';
@@ -24,16 +27,16 @@ import { Images } from './images/images.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images],
+      entities: [Pools, Users, Images, Bookmarks],
       synchronize: true,
       charset : "utf8mb4",
-      timezone : "z"
     }),
     AppModule,
     UsersModule,
     AuthModule,
     PoolsModule,
-    ImagesModule],
+    BookmarksModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
