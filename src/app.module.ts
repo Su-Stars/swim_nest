@@ -16,6 +16,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import * as process from "node:process";
 import { ImagesModule } from './images/images.module';
 import { Images } from './images/images.entity';
+import { CoordinateApiService } from './coordinate-api/coordinate-api.service';
+import { CoordinateApiModule } from './coordinate-api/coordinate-api.module';
 
 @Module({
   imports: [
@@ -35,7 +37,8 @@ import { Images } from './images/images.entity';
     UsersModule,
     AuthModule,
     PoolsModule,
-    BookmarksModule
+    BookmarksModule,
+    CoordinateApiModule
   ],
   controllers: [AppController],
   providers: [AppService],
