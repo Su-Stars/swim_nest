@@ -14,6 +14,8 @@ import { Bookmarks } from "./bookmarks/bookmarks.entity";
 import { BookmarksService } from './bookmarks/bookmarks.service';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import * as process from "node:process";
+import { ImagesModule } from './images/images.module';
+import { Images } from './images/images.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import * as process from "node:process";
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Bookmarks],
+      entities: [Pools, Users, Images, Bookmarks],
       synchronize: true,
       charset : "utf8mb4",
     }),

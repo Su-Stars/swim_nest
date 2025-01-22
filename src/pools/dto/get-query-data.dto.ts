@@ -1,4 +1,4 @@
-import { IsInt, IsOptional } from "class-validator";
+import {  IsOptional, IsString } from "class-validator";
 
 export class GetQueryData {
     @IsOptional()
@@ -9,4 +9,8 @@ export class GetQueryData {
 
     @IsOptional()
     limit: number = 10;
+
+    @IsOptional()
+    @IsString()
+    keyword: string = 'all';
 }

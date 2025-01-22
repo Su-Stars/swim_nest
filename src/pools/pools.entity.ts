@@ -39,19 +39,19 @@ export class Pools{
 
     @Column({nullable: true, name: "is_soap_provided"})
     isSoapProvided: boolean;
-
+    
     @Column({nullable: true, name: "is_towel_provided"})
     isTowelProvided: boolean;
-
+    
     @Column({nullable: true, name: "is_kickboard_allowed"})
     isKickboardAllowed: boolean;
-
+    
     @Column({nullable: true, name: "is_fins_allowed"})
     isFinsAllowed: boolean;
-
+    
     @Column({nullable: true, name: "is_kickboard_rental"})
     isKickboardRental: boolean;
-
+    
     @Column({nullable: true, name: "is_diving_allowed"})
     isDivingAllowed: boolean;
 
