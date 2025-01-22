@@ -41,7 +41,7 @@ export class PoolsController {
     // 관리자 수영장 수정
     @Patch('/:poolId')
     @HttpCode(200)
-    async adminUpdatePool (
+    async adminUpdatePool ( 
         @Req() req: Request,
         @Body() body: createPool,
         @Param('poolId', ParseIntPipe) poolId: number
