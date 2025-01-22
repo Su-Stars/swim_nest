@@ -3,7 +3,9 @@ import { PostBookmarksDto } from "./dto/postBookmarks.dto";
 import { Request } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { BookmarksService } from "./bookmarks.service";
+import { ApiCookieAuth } from "@nestjs/swagger";
 
+@ApiCookieAuth("access-cookie")
 @Controller('api/v1/bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarksService : BookmarksService) {

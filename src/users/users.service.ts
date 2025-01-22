@@ -13,7 +13,7 @@ export class UsersService {
   ) {}
 
   async getMyInfo(jwtPayload : JwtPayload) {
-    const {id} = jwtPayload;
+    const {id, role} : JwtPayload = jwtPayload;
 
     // 이거 수영장 정보랑 연동되면 수정해야함 - 릴레이션으로
     const users = await this.usersRepository.findOneBy({
