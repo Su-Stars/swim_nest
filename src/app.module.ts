@@ -17,6 +17,8 @@ import { LogsModule } from './swim_logs/logs.module';
 import { SwimNestModule } from './swim_nest/swim_nest.module';
 import { SwimLogsModule } from './swim_logs/swim_logs.module';
 import * as process from "node:process";
+import { ImagesModule } from './images/images.module';
+import { Images } from './images/images.entity';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import * as process from "node:process";
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Bookmarks],
+      entities: [Pools, Users, Images, Bookmarks],
       synchronize: true,
       charset : "utf8mb4",
     }),
