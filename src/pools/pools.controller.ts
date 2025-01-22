@@ -52,7 +52,7 @@ export class PoolsController {
     // 관리자 수영장 삭제
     @Delete('/:poolId')
     @HttpCode(200)
-    async adminDeletePool (
+    async adminDeletePool ( 
         @Req() req: Request,
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
