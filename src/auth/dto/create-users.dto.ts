@@ -10,8 +10,9 @@ export class CreateUsersDto {
   @ApiProperty()
   password : string;
 
-  @IsString()
   @ApiProperty()
+  @IsString()
+  @IsOptional()
   nickname : string;
 
   @IsString()
