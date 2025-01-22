@@ -32,6 +32,12 @@ export class Users {
   })
   role : string;
 
+  @Column({
+    type : "text",
+    nullable : true
+  })
+  image_url : string;
+
   @CreateDateColumn({
     type : "datetime",
     default : () => "CURRENT_TIMESTAMP",

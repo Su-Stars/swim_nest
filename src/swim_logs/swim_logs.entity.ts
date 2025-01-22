@@ -13,6 +13,9 @@ export class SwimLogs {
   @JoinColumn({ name : "user_id" })
   users : Users
 
+  @Column()
+  user_id : number;
+
   @Column({
     type : "datetime"
   })
