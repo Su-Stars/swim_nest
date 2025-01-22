@@ -10,9 +10,17 @@ export class CreateUsersDto {
   @ApiProperty()
   password : string;
 
+  @IsString()
+  @ApiProperty()
+  nickname : string;
+
+  @IsString()
+  @IsOptional()
+  role : string;
+
   @IsOptional()
   @ApiProperty()
-  username : string;
+  description : string;
 
   @IsOptional()
   @ApiProperty({

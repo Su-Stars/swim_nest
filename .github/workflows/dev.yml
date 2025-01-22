@@ -31,6 +31,16 @@ jobs:
             
             # JWT 시크릿
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+            echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env
+            
+            # SALT 라운드 횟수
+            echo "SALT_ROUND=${{ secrets.SALT_ROUND }}" >> .env
+            
+            # AWS_S3 버킷 연동을 위한 환경변수
+            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
             
             # DB 연동을 위한 환경변수 주입
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env # .env (IPV4)
