@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
+import { SwimLogs } from "../swim_logs/swim_logs.entity";
 
 @Entity()
 export class Users {
@@ -59,4 +60,7 @@ export class Users {
   // 유저를 참조하는 테이블을 위한 릴레이션
   @OneToMany(() => Bookmarks, (bookmark) => bookmark.users )
   bookmarks : Bookmarks[];
+
+  @OneToMany(() => SwimLogs, (swimLog) => swimLog.users )
+  swimLogs : SwimLogs[];
 }

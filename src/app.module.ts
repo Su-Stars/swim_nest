@@ -13,6 +13,9 @@ import { Users } from "./users/users.entity";
 import { Bookmarks } from "./bookmarks/bookmarks.entity";
 import { BookmarksService } from './bookmarks/bookmarks.service';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { LogsModule } from './swim_logs/logs.module';
+import { SwimNestModule } from './swim_nest/swim_nest.module';
+import { SwimLogsModule } from './swim_logs/swim_logs.module';
 import * as process from "node:process";
 
 @Module({
@@ -33,7 +36,10 @@ import * as process from "node:process";
     UsersModule,
     AuthModule,
     PoolsModule,
-    BookmarksModule
+    BookmarksModule,
+    LogsModule,
+    SwimNestModule,
+    SwimLogsModule
   ],
   controllers: [AppController],
   providers: [AppService],
