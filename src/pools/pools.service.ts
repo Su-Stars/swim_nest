@@ -1,9 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
+import { Request } from 'express';
+import { JwtPayload } from 'src/auth/dto/jwt-payload';
 
 @Injectable()
 export class PoolsService {
@@ -13,8 +15,8 @@ export class PoolsService {
     ) {}
 
     // Pool 전체 조회
-    async getAllPools(Query: GetQueryData): Promise<any> {
-        const {page, limit, region, keyword} = Query;
+    async getAllPools(query: GetQueryData): Promise<any> {
+        const {page, limit, region, keyword} = query;
         
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
@@ -74,17 +76,17 @@ export class PoolsService {
                     'pool.website',
                     'pool.latitude',
                     'pool.longtitude',
-                    'pool.free_swim_link AS freeSwimLink',
-                    'pool.swim_lesson_link AS swimLessonLink',
-                    'pool.lane_info AS laneInfo',
-                    'pool.depth_info AS depthInfo',
-                    'pool.is_soap_provided AS isSoapProvided',
-                    'pool.is_towel_provided AS isTowelProvided',
-                    'pool.is_kickboard_allowed AS isKickboardAllowed',
-                    'pool.is_fins_allowed AS isFinsAllowed',
-                    'pool.is_kickboard_rental AS isKickboardRental',
-                    'pool.is_diving_allowed AS isDivingAllowed',
-                    'pool.is_photo_allowed AS isPhotoAllowed'
+                    'pool.freeSwimLink',
+                    'pool.swimLessonLink',
+                    'pool.laneInfo',
+                    'pool.depthInfo',
+                    'pool.isSoapProvided',
+                    'pool.isTowelProvided',
+                    'pool.isKickboardAllowed',
+                    'pool.isFinsAllowed',
+                    'pool.isKickboardRental',
+                    'pool.isDivingAllowed',
+                    'pool.isPhotoAllowed'
                     ])
             .where('pool.id = :id', { id: poolId})
             .getMany();
@@ -102,18 +104,14 @@ export class PoolsService {
     }
 
     // 관리자 Pool 추가
-    async adminCreatePool(token: string, body: createPool) {
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
+    async adminCreatePool(req: Request, body: createPool) {
+        const {role} : JwtPayload = req["user"]
         
-        if (token === 'user') {
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const {id} = await this.PoolsRepository.save(body);
 
             return {
@@ -125,18 +123,14 @@ export class PoolsService {
     }
 
     // 관리자 pool 수정
-    async adminUpdatePool (token: string, poolId: number, body: createPool) {
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
+    async adminUpdatePool (req: Request, poolId: number, body: createPool) {
+        const {role} : JwtPayload = req["user"]
 
-        if (token === 'user') {
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0) {
                 throw new NotFoundException();
@@ -152,19 +146,14 @@ export class PoolsService {
     }
 
     // 관리자 Pool 삭제
-    async adminDeletePool(token: string, poolId: number) {
-        
-        if (!token) {
-            throw new UnauthorizedException({
-                message: "토큰이 존재하지 않습니다."
-            })
-        }
-        
-        if (token === 'user') {
+    async adminDeletePool(req: Request, poolId: number) {
+        const {role} : JwtPayload = req["user"]
+
+        if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (token === 'admin') {
+        } else if (role === 'admin') {
             const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0){
                 throw new NotFoundException();
@@ -177,4 +166,4 @@ export class PoolsService {
             }
         }
     }
-}
+}   

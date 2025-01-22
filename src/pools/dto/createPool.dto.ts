@@ -1,73 +1,71 @@
-import { Expose } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class createPool {
     @IsNotEmpty()
+    @IsString()
     name: string;
 
     @IsNotEmpty()
+    @IsString()
     address: string;
 
     @IsOptional()
+    @IsString()
     phone: string;
 
     @IsOptional()
+    @IsString()
     website: string;
 
     @IsOptional()
+    @IsString()
     images: string;
 
     @IsOptional()
-    @Expose({name: "freeSwimLink"})
-    free_swim_link: string;
+    @IsString()
+    freeSwimLink: string;
 
     @IsOptional()
-    @Expose({name: "swimLessonLink"})
-    swim_lesson_link: string;
+    @IsString()
+    swimLessonLink: string;
 
     @IsOptional()
-    @Expose({name: "laneInfo"})
-    lane_info: string;
+    @IsString()
+    laneInfo: string;
 
     @IsOptional()
-    @Expose({name: "depthInfo"})
-    depth_info: string;
-
-    @IsOptional()
-    @IsBoolean()
-    @Expose({name: "isSoapProvided"})
-    is_soap_provided: boolean;
+    @IsString()
+    depthInfo: string;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isTowelProvided"})
-    is_towel_provided: boolean;
+    isSoapProvided: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isKickboardAllowed"})
-    is_kickboard_allowed: boolean;
+    isTowelProvided: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isFinsAllowed"})
-    is_fins_allowed: boolean;
+    isKickboardAllowed: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isKickboardRental"})
-    is_kickboard_rental: boolean;
+    isFinsAllowed: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isDivingAllowed"})
-    is_diving_allowed: boolean;
+    isKickboardRental: boolean;
 
     @IsOptional()
     @IsBoolean()
-    @Expose({name: "isPhotoAllowed"})
-    is_photo_allowed: boolean;
+    isDivingAllowed: boolean;
 
     @IsOptional()
+    @IsBoolean()
+    isPhotoAllowed: boolean;
+
+    @IsOptional()
+    @IsString()
     description: string;
 }

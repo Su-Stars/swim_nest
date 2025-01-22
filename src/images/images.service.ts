@@ -1,10 +1,12 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Injectable, UnsupportedMediaTypeException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnsupportedMediaTypeException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import { Repository } from 'typeorm';
 import { Images } from './images.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtPayload } from 'src/auth/dto/jwt-payload';
+import { Request } from 'express';
 
 @Injectable()
 export class ImagesService {
@@ -24,7 +26,18 @@ export class ImagesService {
         })
     }
 
-    async uploadImages (file: Express.Multer.File) {
+    async uploadImages (
+        req: Request,
+        file: Express.Multer.File
+    ) {
+        const {role} : JwtPayload = req["user"]
+
+        if (role === 'user') {
+                    throw new ForbiddenException({
+                        message: "권한이 존재하지 않습니다."
+                    })
+                }
+
         const { size, mimetype, buffer } = file;
         const type = ['image/png', 'image/jpeg', 'image/gif']
         const ext = path.extname(file.originalname);

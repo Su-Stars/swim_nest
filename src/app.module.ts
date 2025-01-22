@@ -27,7 +27,7 @@ import { Images } from './images/images.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Bookmarks, Images],
+      entities: [Pools, Users, Images, Bookmarks],
       synchronize: true,
       charset : "utf8mb4",
     }),
