@@ -19,7 +19,13 @@ export class AuthService {
 
   // 회원가입 - 나중에 multipart/form-data 형식으로 오면 이미지 s3 버킷에 날려줘야함 - 추후 수정해야한다.
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
-    const {email, password, nickname, role, description} = createUsersDto;
+    const {email, password, role, description} = createUsersDto;
+
+    let {nickname} = createUsersDto;
+
+    if(!nickname) {
+      nickname = await this.generateCuteRandomName();
+    }
 
     // 여기에 image 서비스 넣을 예정.
 
@@ -256,5 +262,61 @@ export class AuthService {
 
     return users.password === hashedPwd;
   }
+
+  // 랜덤으로 이름을 지어 사용자의 이름을 정해준다.
+  private async generateCuteRandomName() {
+    const adjectives = [
+      "귀여운",
+      "달려가는",
+      "웃는",
+      "작은",
+      "빠른",
+      "재빠른",
+      "용감한",
+      "행복한",
+      "뭉클한",
+      "감격스런",
+      "감사한",
+      "즐거운",
+      "기쁜",
+      "따뜻한"
+    ];
+
+    const animals = [
+      "다람쥐",
+      "청솔모",
+      "토끼",
+      "사슴",
+      "호랑이",
+      "고양이",
+      "강아지",
+      "사자",
+      "거북이",
+      "코알라",
+      "수달",
+      "꽃사슴",
+      "고라니",
+      "담비",
+    ];
+
+    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+
+    const lastUsers = await this.usersRepository.findOne({
+      order : {
+        create_at : "DESC"
+      }
+    });
+
+    let number = 0;
+
+    if(lastUsers) {
+      number = lastUsers.id
+    }
+
+    return randomAdjective + " " + randomAnimal + number;
+  }
 }
+
+
 
