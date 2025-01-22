@@ -24,5 +24,12 @@ export class SwimLogsService {
       end = String(year) + "-" + String(month) + "-" + String(lastDay) + " 23:59:59";
     }
 
+    const swimLogList = await this.swimLogsRepository.find({
+      where : {
+        swim_date : Between(start, end)
+      },
+    })
+
+    return swimLogList;
   }
 }

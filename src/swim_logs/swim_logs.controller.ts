@@ -5,6 +5,7 @@ import { ApiQuery } from "@nestjs/swagger";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { WriteSwimLogDto } from "./dto/writeSwimLog.dto";
 import { SwimLogsService } from "./swim_logs.service";
+import { SwimLogs } from "./swim_logs.entity";
 
 @Controller("api/v1/logs")
 export class SwimLogsController {
@@ -41,8 +42,12 @@ export class SwimLogsController {
 
     const {id} = jwtPayload;
 
-    const result = await this.swimLogsService.getMySwimLogs(id, swimLogQuery);
+    const mySwimLogs : SwimLogs[] = await this.swimLogsService.getMySwimLogs(id, swimLogQuery);
 
-
+    return {
+      status : "success",
+      message : "수영 기록을 가져오는 데 성공했습니다.",
+      data : mySwimLogs
+    }
   }
 }
