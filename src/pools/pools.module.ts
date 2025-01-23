@@ -11,8 +11,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { HttpModule } from '@nestjs/axios';
-import { AuthMiddleware } from '../common/middleware/auth.middleware';
-import { AuthModule } from '../auth/auth.module';
+import { AuthMiddleware } from 'src/common/middleware/auth.middleware';
+import { AuthModule } from 'src/auth/auth.module';
+import { ImagesModule } from 'src/images/images.module';
+import { ImagesService } from 'src/images/images.service';
 import { BookmarksModule } from '../bookmarks/bookmarks.module';
 
 @Module({
@@ -20,11 +22,13 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
     TypeOrmModule.forFeature([Pools]),
     HttpModule,
     AuthModule,
+    ImagesModule,
+    AuthModule,
     forwardRef(() => BookmarksModule),
   ],
   controllers: [PoolsController],
-  providers: [PoolsService, CoordinateApiService],
-  exports: [PoolsService, CoordinateApiService, TypeOrmModule],
+  providers: [PoolsService, CoordinateApiService,ImagesService],
+  exports: [PoolsService, CoordinateApiService, TypeOrmModule, ]
 })
 export class PoolsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

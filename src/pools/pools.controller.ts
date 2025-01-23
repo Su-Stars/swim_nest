@@ -14,6 +14,7 @@ import {
     Req,
     SerializeOptions,
     UnauthorizedException,
+    UploadedFile,
     UseInterceptors,
     UsePipes,
     ValidationPipe
@@ -22,7 +23,9 @@ import { PoolsService } from './pools.service';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
-import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
+import { updatePool } from './dto/updatePool.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
 
 
@@ -30,7 +33,7 @@ import { JwtPayload } from "../auth/dto/jwt-payload";
 export class PoolsController {
     constructor(
         private poolsService: PoolsService,
-        private coordinateAPI: CoordinateApiService
+        private imagesService: ImagesService
     ) {}
     
     // 수영장 정보 조회
@@ -51,7 +54,6 @@ export class PoolsController {
     ) {
         return this.poolsService.getByIdPool(poolId);
     }
-
     
     // 관리자 수영장 추가
     @Post()
@@ -68,7 +70,7 @@ export class PoolsController {
     @HttpCode(200)
     async adminUpdatePool ( 
         @Req() req: Request,
-        @Body() body: createPool,
+        @Body() body: updatePool,
         @Param('poolId', ParseIntPipe) poolId : number
     ) {
         return this.poolsService.adminUpdatePool(req, poolId, body)
@@ -101,6 +103,15 @@ export class PoolsController {
         @Param('poolId', ParseIntPipe) poolId: number
     ) {
         return await this.poolsService.adminDeletePool(req, poolId);
+    }
+
+
+    // 관리자 수영장 이미지 추가
+    @Post('/images/:poolId')
+    @HttpCode(200)
+    @UseInterceptors(FileInterceptor('pools'))
+    async uploadImages (@UploadedFile() file: Express.Multer.File) {
+        this.imagesService.uploadImages(file)
     }
 }
 

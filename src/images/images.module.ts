@@ -17,6 +17,12 @@ import { MulterModule } from '@nestjs/platform-express';
         })
     ],
     controllers: [ImagesController],
-    providers: [ImagesService]
+    providers: [ImagesService],
+    exports : [
+        ImagesService,
+        ConfigModule,
+        TypeOrmModule,
+        MulterModule
+    ]
 })
 export class ImagesModule {}
