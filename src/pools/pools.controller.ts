@@ -110,7 +110,11 @@ export class PoolsController {
     @Post('/images/:poolId')
     @HttpCode(200)
     @UseInterceptors(FileInterceptor('pools'))
-    async uploadImages (@UploadedFile() file: Express.Multer.File) {
+    async uploadImages (
+        @Req() req: Request,
+        @Param('poolId', ParseIntPipe) poolId: number,
+        @UploadedFile() file: Express.Multer.File
+    ) {
         this.imagesService.uploadImages(file)
     }
 }
