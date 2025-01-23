@@ -21,14 +21,27 @@ export class AuthService {
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
     const {email, password, role, description} = createUsersDto;
 
+    // 이미 해당 이메일을 가진 유저가 존재하는지 확인
+    const isExistingEmail = await this.usersRepository.findOne({
+      where : {
+        email : email
+      }
+    })
+
+    if(isExistingEmail) {
+      throw new HttpException({
+        status : "fail",
+        message : "동일한 이메일을 가진 유저가 존재합니다."
+      }, HttpStatus.NOT_ACCEPTABLE)
+    }
+
+
     let {nickname} = createUsersDto;
 
+    // 사용자가 닉네임을 넣지 않았다면,
     if(!nickname) {
       nickname = await this.generateCuteRandomName();
     }
-
-    // 여기에 image 서비스 넣을 예정.
-
 
     // 환경변수에서 salt 몇 번 돌려서 암호화 할 건지 가져옴.
     const saltRound = parseInt(process.env.SALT_ROUND);
@@ -302,19 +315,12 @@ export class AuthService {
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
 
-    const lastUsers = await this.usersRepository.findOne({
-      order : {
-        create_at : "DESC"
-      }
-    });
+    const lastUsersId = await this.usersRepository
+      .createQueryBuilder("users")
+      .select("MAX(users.id)", "maxId")
+      .getRawOne();
 
-    let number = 0;
-
-    if(lastUsers) {
-      number = lastUsers.id
-    }
-
-    return randomAdjective + " " + randomAnimal + number;
+    return randomAdjective + " " + randomAnimal + lastUsersId.maxId;
   }
 }
 
