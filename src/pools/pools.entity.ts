@@ -1,5 +1,16 @@
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { 
+    Column, 
+    CreateDateColumn, 
+    Entity, 
+    Index, 
+    JoinColumn, 
+    ManyToOne, 
+    OneToMany, 
+    PrimaryGeneratedColumn, 
+    UpdateDateColumn 
+} from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
+import { Images } from "src/images/images.entity";
 
 @Entity()
 @Index("FT_search", ['name', 'address'], {fulltext: true})
@@ -70,4 +81,31 @@ export class Pools{
     // Pools 를 참조하는 테이블을 위한 릴레이션
     @OneToMany(() => Bookmarks, (bookmark) => bookmark.pools)
     bookmarks : Bookmarks[];
+
+    @OneToMany(() => poolImages, (poolimages) => poolimages.poolid)
+    pools: Pools
+}
+
+
+@Entity()
+export class poolImages {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @ManyToOne(() => Pools, (pools) => pools.pools, {
+        onDelete : "CASCADE"
+    })
+    @JoinColumn({
+        name: 'pool_id'
+    })
+    poolid: poolImages
+
+    @ManyToOne(() => Images, (images) => images.imagesId, {
+        onDelete : "CASCADE"
+    })
+    @JoinColumn({
+        name: "image_id"
+    })
+    image: poolImages
+
 }

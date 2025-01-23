@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ImagesController } from './images.controller';
 import { ImagesService } from './images.service';
 import { Images } from './images.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,8 +15,12 @@ import { MulterModule } from '@nestjs/platform-express';
             }
         })
     ],
-    controllers: [ImagesController],
     providers: [ImagesService],
-    exports: [ImagesService]
+    exports : [
+        ImagesService,
+        ConfigModule,
+        TypeOrmModule,
+        MulterModule
+    ]
 })
 export class ImagesModule {}

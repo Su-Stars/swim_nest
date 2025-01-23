@@ -1,4 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    ForbiddenException,
+    forwardRef,
+    HttpException,
+    HttpStatus, Inject,
+    Injectable,
+    NotFoundException
+} from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { Repository } from 'typeorm';
@@ -6,12 +13,17 @@ import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
 import { JwtPayload } from 'src/auth/dto/jwt-payload';
+import { BookmarksService } from "../bookmarks/bookmarks.service";
+import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
+import { updatePool } from './dto/updatePool.dto';
 
 @Injectable()
 export class PoolsService {
     constructor(
         @InjectRepository(Pools)
-        private PoolsRepository: Repository<Pools>
+        private PoolsRepository: Repository<Pools>,
+        private coordinateAPI: CoordinateApiService,
+        private readonly bookmarksService : BookmarksService
     ) {}
 
     // Pool 전체 조회
@@ -106,42 +118,55 @@ export class PoolsService {
     // 관리자 Pool 추가
     async adminCreatePool(req: Request, body: createPool) {
         const {role} : JwtPayload = req["user"]
-        
+        const {address} : createPool = body
+        const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+
         if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
         } else if (role === 'admin') {
-            const {id} = await this.PoolsRepository.save(body);
+            const { identifiers } = await this.PoolsRepository.insert({...body, longtitude, latitude});
 
             return {
                 status: "success",
                 message: "수영장 정보가 추가되었습니다.",
-                data: {id}
+                data: identifiers[0].id
             }
         }
     }
 
     // 관리자 pool 수정
-    async adminUpdatePool (req: Request, poolId: number, body: createPool) {
+    async adminUpdatePool (req: Request, poolId: number, body: updatePool) {
         const {role} : JwtPayload = req["user"]
 
         if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
-        } else if (role === 'admin') {
-            const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
+        }
+
+        const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0) {
                 throw new NotFoundException();
             }
 
+
+        if (body.address) {
+            const {address} : updatePool = body
+            const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+
+            await this.PoolsRepository.update({id: poolId}, {...body, longtitude, latitude})
+            return {
+                status: "success",
+                message: "수영장 정보가 수정되었습니다."
+            }
+        } else {   
             await this.PoolsRepository.update({id: poolId}, body)
             return {
                 status: "success",
                 message: "수영장 정보가 수정되었습니다."
             }
-            
         }
     }
 
@@ -165,5 +190,22 @@ export class PoolsService {
                 message: "수영장 정보가 삭제되었습니다."
             }
         }
+    }
+
+    async isBookmarked(user_id : number, pool_id : number) {
+        const isExistPool = await this.PoolsRepository.findOneBy({
+            id : pool_id
+        })
+
+        if(!isExistPool) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.BAD_REQUEST)
+        }
+
+        const isBookmarked = await this.bookmarksService.isBookmarked(user_id, pool_id);
+
+        return isBookmarked;
     }
 }   

@@ -10,8 +10,9 @@ export class CreateUsersDto {
   @ApiProperty()
   password : string;
 
-  @IsString()
   @ApiProperty()
+  @IsString()
+  @IsOptional()
   nickname : string;
 
   @IsString()
@@ -22,9 +23,4 @@ export class CreateUsersDto {
   @ApiProperty()
   description : string;
 
-  @IsOptional()
-  @ApiProperty({
-    description : "이미지 경로 - S3 경로"
-  })
-  image : string;
 }

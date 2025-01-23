@@ -19,10 +19,29 @@ export class AuthService {
 
   // 회원가입 - 나중에 multipart/form-data 형식으로 오면 이미지 s3 버킷에 날려줘야함 - 추후 수정해야한다.
   async register(createUsersDto : CreateUsersDto) : Promise<Users> {
-    const {email, password, nickname, role, description} = createUsersDto;
+    const {email, password, role, description} = createUsersDto;
 
-    // 여기에 image 서비스 넣을 예정.
+    // 이미 해당 이메일을 가진 유저가 존재하는지 확인
+    const isExistingEmail = await this.usersRepository.findOne({
+      where : {
+        email : email
+      }
+    })
 
+    if(isExistingEmail) {
+      throw new HttpException({
+        status : "error",
+        message : "동일한 이메일을 가진 유저가 존재합니다."
+      }, HttpStatus.NOT_ACCEPTABLE)
+    }
+
+
+    let {nickname} = createUsersDto;
+
+    // 사용자가 닉네임을 넣지 않았다면,
+    if(!nickname) {
+      nickname = await this.generateCuteRandomName();
+    }
 
     // 환경변수에서 salt 몇 번 돌려서 암호화 할 건지 가져옴.
     const saltRound = parseInt(process.env.SALT_ROUND);
@@ -74,6 +93,7 @@ export class AuthService {
     // 비밀번호가 틀림.
     if(!loginSuccess) {
       throw new HttpException({
+        status : "fail",
         message : "비밀번호가 틀렸습니다."
       }, HttpStatus.UNAUTHORIZED);
     }
@@ -93,8 +113,8 @@ export class AuthService {
     await this.setAuthCookies(response, {accessToken, refreshToken});
 
     return {
-      message : "로그인 성공했습니다.",
       status : "success",
+      message : "로그인 성공했습니다.",
       data : result,
     }
   }
@@ -129,7 +149,7 @@ export class AuthService {
   }> {
     const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
 
-    const accessToken = this.jwtService.sign(restPayload, {
+    const accessToken = await this.jwtService.signAsync(restPayload, {
       secret : process.env.JWT_SECRET,
       expiresIn : "5m",
     })
@@ -144,6 +164,8 @@ export class AuthService {
   ) : Promise<void> {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
+      sameSite : "none",
+      secure : true,
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
@@ -151,6 +173,8 @@ export class AuthService {
     if(tokens.refreshToken){
       response.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
+        sameSite : "none",
+        secure : true,
         maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
       });
 
@@ -161,12 +185,14 @@ export class AuthService {
   async clearAuthCookies(response: Response) : Promise<void> {
     response.clearCookie('access_token', {
       httpOnly: true,
-      sameSite: 'strict',
+      secure : true,
+      sameSite: 'none',
     });
 
     response.clearCookie('refresh_token', {
       httpOnly: true,
-      sameSite: 'strict',
+      secure : true,
+      sameSite: 'none',
     });
   }
 
@@ -179,7 +205,7 @@ export class AuthService {
     token = token.replace("Bearer ", "");
 
     try {
-      return this.jwtService.verify(token, {
+      return await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
     } catch (error) {
@@ -199,19 +225,19 @@ export class AuthService {
     token = token.replace("Bearer ", "");
 
     try {
-      return this.jwtService.verify(token, {
+      return await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
     } catch (error) {
       return new HttpException({
-        message : "access_token 검증 중 실패",
+        message : "refresh_token 검증 중 실패",
         error : error,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async verificationEmail(email : string) : Promise<boolean> {
-    const getUser = this.usersRepository.findOneBy({
+    const getUser = await this.usersRepository.findOneBy({
       email : email
     })
 
@@ -226,6 +252,7 @@ export class AuthService {
     if(!isValidPwd) {
       throw new HttpException(
         {
+          status : "fail",
           message : "주어진 비밀번호가 일치하지 않습니다."
         },
         HttpStatus.BAD_REQUEST
@@ -252,9 +279,58 @@ export class AuthService {
   private async checkPwd(users : Users, password : string) : Promise<boolean> {
     const salt = users.salt;
 
-    const hashedPwd = bcrypt.hashSync(password, salt);
+    const hashedPwd = await bcrypt.hash(password, salt);
 
     return users.password === hashedPwd;
   }
+
+  // 랜덤으로 이름을 지어 사용자의 이름을 정해준다.
+  private async generateCuteRandomName() {
+    const adjectives = [
+      "귀여운",
+      "달려가는",
+      "웃는",
+      "작은",
+      "빠른",
+      "재빠른",
+      "용감한",
+      "행복한",
+      "뭉클한",
+      "감격스런",
+      "감사한",
+      "즐거운",
+      "기쁜",
+      "따뜻한"
+    ];
+
+    const animals = [
+      "다람쥐",
+      "청솔모",
+      "토끼",
+      "사슴",
+      "호랑이",
+      "고양이",
+      "강아지",
+      "사자",
+      "거북이",
+      "코알라",
+      "수달",
+      "꽃사슴",
+      "고라니",
+      "담비",
+    ];
+
+    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+
+    const lastUsersId = await this.usersRepository
+      .createQueryBuilder("users")
+      .select("MAX(users.id)", "maxId")
+      .getRawOne();
+
+    return randomAdjective + " " + randomAnimal + lastUsersId.maxId;
+  }
 }
+
+
 

@@ -1,15 +1,17 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Bookmarks } from "./bookmarks.entity";
 import { BookmarksService } from "./bookmarks.service";
 import { BookmarksController } from './bookmarks.controller';
 import { AuthMiddleware } from "../common/middleware/auth.middleware";
 import { AuthModule } from "../auth/auth.module";
+import { PoolsModule } from "../pools/pools.module";
 
 @Module({
   imports: [
+    forwardRef(() => PoolsModule),
     TypeOrmModule.forFeature([Bookmarks]),
-    AuthModule
+    AuthModule,
   ],
   controllers: [BookmarksController],
   providers: [BookmarksService],

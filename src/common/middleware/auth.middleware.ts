@@ -31,7 +31,7 @@ export class AuthMiddleware implements NestMiddleware {
       )
 
       // Access Token 만 만료되었다면.
-    } else if(accessOrErr instanceof HttpException) {
+    } else if(accessOrErr instanceof HttpException && !(refreshOrErr instanceof HttpException)) {
       // Refresh 토큰으로부터 내부의 페이로드를 가져와서 그대로 access 토큰으로 발급한다. (내용물은 동일하므로)
       const tokenPayload = await this.authService.validateRefreshToken(refreshToken);
 
@@ -48,6 +48,8 @@ export class AuthMiddleware implements NestMiddleware {
       // 결과적으로 리프레쉬 토큰으로 액세스 토큰을 새로 발급한 것이다.
       res.cookie("access_token", newAccessToken.accessToken, {
         httpOnly : true,
+        sameSite : "none",
+        secure : true,
         maxAge : 5 * 60 * 1000, // 5 분
       });
 

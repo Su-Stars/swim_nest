@@ -3,7 +3,7 @@ import { UsersService } from "./users.service";
 import { Request, Response } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { EditUserInfoDto } from "./dto/editUserInfo.dto";
-import { ApiCookieAuth } from "@nestjs/swagger";
+import { ApiBody, ApiCookieAuth } from "@nestjs/swagger";
 import { AuthService } from "../auth/auth.service";
 
 @Controller('api/v1/users')
@@ -33,6 +33,9 @@ export class UsersController {
   // 본인의 정보 수정
   @Patch("me")
   @ApiCookieAuth()
+  @ApiBody({
+    type : EditUserInfoDto
+  })
   async patchAccount(@Req() req : Request, @Body() editInfo : EditUserInfoDto) {
     const jwtPayload : JwtPayload = req["user"];
 

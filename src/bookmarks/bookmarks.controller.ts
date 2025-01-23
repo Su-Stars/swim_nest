@@ -3,7 +3,9 @@ import { PostBookmarksDto } from "./dto/postBookmarks.dto";
 import { Request } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { BookmarksService } from "./bookmarks.service";
+import { ApiCookieAuth } from "@nestjs/swagger";
 
+@ApiCookieAuth("access-cookie")
 @Controller('api/v1/bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarksService : BookmarksService) {
@@ -11,7 +13,7 @@ export class BookmarksController {
 
   // 내 북마크에 새로운 수영장을 추가한다.
   @Post()
-  async myBookmarks(@Body() postBookmarksDto: PostBookmarksDto, @Req() req : Request) {
+  async addBookmarks(@Body() postBookmarksDto: PostBookmarksDto, @Req() req : Request) {
     const jwtPayload : JwtPayload = req["user"];
 
     const {id} = jwtPayload;

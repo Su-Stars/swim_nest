@@ -14,7 +14,8 @@ async function bootstrap() {
       'https://localhost:3000',
       'http://localhost:3000',
       'http://nest-aws.site',
-      'https://nest-aws.site'
+      'https://nest-aws.site',
+      'https://apuu.netlify.app/'
     ],
     // 앞으로 사용하게 될 메서드에 대한 허용.
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -44,18 +45,17 @@ async function bootstrap() {
 
  // 만들어질 도메인에 "/api" 로 들어가면, 현재까지 만들어진 api 목록들을 쉽게 볼 수 있습니다. 협업을 위해 필수적인 도구입니다.
   const config = new DocumentBuilder()
-    .addBearerAuth()
     .setTitle('SwimStar API Docs')
     .setDescription('API documentation')
     .setVersion('1.0')
     .addTag('api')
     // Bearer 토큰을 필요로 하는 라우트의 경우, "@ApiBearerAuth('access_token')" 데코레이터를 붙여서 스웨거 문서에 알릴 수 있습니다.(컨트롤러 and 메서드 가능)
-    .addBearerAuth(
+    .addCookieAuth(
+      "access-cookie",
       {
         type: 'http',
         scheme : 'Bearer',
-        in: 'header',
-        name: 'JWT',
+        in: 'cookie',
       },
       'access_token',
     )
@@ -74,7 +74,11 @@ async function bootstrap() {
   // 프로그램이 실행되기 위해 컴파일 되는 과정에서 swagger 전용 데코레이터 "ApiBody", "ApiQuery", "ApiHeader" 를 파악하여 스웨거 문서로 변환합니다.
   const document = SwaggerModule.createDocument(app, config);
   // 스웨거 문서는 "/api" 에서 볼 수 있습니다.
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions : {
+      persistAuthorization : true,
+    }
+  });
 
   await app.listen(3000);
 }
