@@ -165,6 +165,7 @@ export class AuthService {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       sameSite : "none",
+      secure : true,
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
@@ -173,6 +174,7 @@ export class AuthService {
       response.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
         sameSite : "none",
+        secure : true,
         maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
       });
 
@@ -183,11 +185,13 @@ export class AuthService {
   async clearAuthCookies(response: Response) : Promise<void> {
     response.clearCookie('access_token', {
       httpOnly: true,
+      secure : true,
       sameSite: 'none',
     });
 
     response.clearCookie('refresh_token', {
       httpOnly: true,
+      secure : true,
       sameSite: 'none',
     });
   }
