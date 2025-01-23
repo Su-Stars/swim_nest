@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { SwimLogs } from "./swim_logs.entity";
 import { Between, Repository } from "typeorm";
 import { WriteSwimLogDto } from "./dto/writeSwimLog.dto";
+import { fullTimeToDate } from "../common/util/date-util";
 
 @Injectable()
 export class SwimLogsService {
@@ -51,7 +52,7 @@ export class SwimLogsService {
 
     const resultLogList = swimLogList.map((swimLog) => ({
       ...swimLog,
-      swim_date : `${swimLog.swim_date.getFullYear()}-${String(swimLog.swim_date.getMonth() + 1).padStart(2, '0')}-${String(swimLog.swim_date.getDate()).padStart(2, '0')}`
+      swim_date : fullTimeToDate(swimLog.swim_date)
     }))
 
     return resultLogList;
@@ -77,7 +78,7 @@ export class SwimLogsService {
 
     const returnLog = {
       ...swimLog,
-      swim_date : `${swimLog.swim_date.getFullYear()}-${String(swimLog.swim_date.getMonth() + 1).padStart(2, '0')}-${String(swimLog.swim_date.getDate()).padStart(2, '0')}`
+      swim_date : fullTimeToDate(swimLog.swim_date)
     }
 
     return returnLog;
