@@ -14,6 +14,7 @@ import { SwimLogsModule } from './swim_logs/swim_logs.module';
 import * as process from "node:process";
 import { Images } from './images/images.entity';
 import { SwimLogs } from "./swim_logs/swim_logs.entity";
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SwimLogs } from "./swim_logs/swim_logs.entity";
     UsersModule,
     AuthModule,
     PoolsModule,
+    ImagesModule,
     BookmarksModule,
     SwimLogsModule,
   ],

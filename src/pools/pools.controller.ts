@@ -109,13 +109,13 @@ export class PoolsController {
     // 관리자 수영장 이미지 추가
     @Post('/images/:poolId')
     @HttpCode(200)
-    @UseInterceptors(FileInterceptor('pools'))
+    @UseInterceptors(FileInterceptor('pool'))
     async uploadImages (
         @Req() req: Request,
-        @Param('poolId', ParseIntPipe) poolId: number,
+        @Param('poolId', ParseIntPipe) id: number,
         @UploadedFile() file: Express.Multer.File
     ) {
-        this.imagesService.uploadImages(file)
+        this.imagesService.uploadImages(req, file, id)
     }
 }
 
