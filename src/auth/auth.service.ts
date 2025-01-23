@@ -148,7 +148,7 @@ export class AuthService {
   }> {
     const { exp, ...restPayload } = payload; // exp 속성을 제거 - 중복 만료 선언때문에 오류남.
 
-    const accessToken = this.jwtService.sign(restPayload, {
+    const accessToken = await this.jwtService.signAsync(restPayload, {
       secret : process.env.JWT_SECRET,
       expiresIn : "5m",
     })
@@ -198,7 +198,7 @@ export class AuthService {
     token = token.replace("Bearer ", "");
 
     try {
-      return this.jwtService.verify(token, {
+      return await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
     } catch (error) {
@@ -218,7 +218,7 @@ export class AuthService {
     token = token.replace("Bearer ", "");
 
     try {
-      return this.jwtService.verify(token, {
+      return await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
     } catch (error) {

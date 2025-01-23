@@ -13,7 +13,7 @@ export class BookmarksController {
 
   // 내 북마크에 새로운 수영장을 추가한다.
   @Post()
-  async myBookmarks(@Body() postBookmarksDto: PostBookmarksDto, @Req() req : Request) {
+  async addBookmarks(@Body() postBookmarksDto: PostBookmarksDto, @Req() req : Request) {
     const jwtPayload : JwtPayload = req["user"];
 
     const {id} = jwtPayload;
