@@ -3,12 +3,16 @@ import { PoolsService } from './pools.service';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
+import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 
 
 @Controller('api/v1/pools')
 export class PoolsController {
-    constructor(private poolsService: PoolsService) {}
-
+    constructor(
+        private poolsService: PoolsService,
+        private coordinateAPI: CoordinateApiService
+    ) {}
+    
     // 수영장 정보 조회
     @Get()
     @HttpCode(200)
@@ -59,6 +63,4 @@ export class PoolsController {
         return await this.poolsService.adminDeletePool(req, poolId)
     }
 }
-
-//test 글자
 

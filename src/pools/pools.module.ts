@@ -4,18 +4,21 @@ import { PoolsService } from './pools.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
-import { CoordinateApiModule } from 'src/coordinate-api/coordinate-api.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Pools]),
-    CoordinateApiModule
+    HttpModule
 ],
   controllers: [PoolsController],
   providers: [
     PoolsService,
   CoordinateApiService
   ],
-  exports: [PoolsService]
+  exports: [
+    PoolsService
+  ,CoordinateApiService
+  ]
 })
 export class PoolsModule {}
