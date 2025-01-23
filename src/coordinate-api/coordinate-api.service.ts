@@ -6,7 +6,7 @@ import { lastValueFrom } from 'rxjs';
 export class CoordinateApiService {
     constructor(private httpService: HttpService) {}
 
-    async fechData(body: any) {
+    async fechData(address) {
         const key = process.env.KAKAO_KEY
         const headers = {
             'Authorization': key
@@ -14,7 +14,7 @@ export class CoordinateApiService {
 
         const response = await lastValueFrom(
         this.httpService.get(
-            `https://dapi.kakao.com/v2/local/search/address.JSON?query=${body}`, 
+            `https://dapi.kakao.com/v2/local/search/address.JSON?query=${address}`, 
             {headers}
         )
     );
