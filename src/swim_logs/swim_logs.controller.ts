@@ -87,7 +87,7 @@ export class SwimLogsController {
 
     return {
       status : "success",
-      message : "수영 기록을 가져오는 데 성공했습니다.",
+      message : mySwimLogs.length === 0 ? "수영 기록이 없습니다." : "수영 기록을 가져오는 데 성공했습니다.",
       data : {
         year : swimLogQuery.year,
         month : swimLogQuery.month,
