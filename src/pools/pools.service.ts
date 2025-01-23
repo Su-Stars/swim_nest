@@ -1,4 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    ForbiddenException,
+    forwardRef,
+    HttpException,
+    HttpStatus, Inject,
+    Injectable,
+    NotFoundException
+} from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pools } from './pools.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +13,7 @@ import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
 import { JwtPayload } from 'src/auth/dto/jwt-payload';
+import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { updatePool } from './dto/updatePool.dto';
 
@@ -14,7 +22,8 @@ export class PoolsService {
     constructor(
         @InjectRepository(Pools)
         private PoolsRepository: Repository<Pools>,
-        private coordinateAPI: CoordinateApiService
+        private coordinateAPI: CoordinateApiService,
+        private readonly bookmarksService : BookmarksService
     ) {}
 
     // Pool 전체 조회
@@ -181,5 +190,22 @@ export class PoolsService {
                 message: "수영장 정보가 삭제되었습니다."
             }
         }
+    }
+
+    async isBookmarked(user_id : number, pool_id : number) {
+        const isExistPool = await this.PoolsRepository.findOneBy({
+            id : pool_id
+        })
+
+        if(!isExistPool) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.BAD_REQUEST)
+        }
+
+        const isBookmarked = await this.bookmarksService.isBookmarked(user_id, pool_id);
+
+        return isBookmarked;
     }
 }   

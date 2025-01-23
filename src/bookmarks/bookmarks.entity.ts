@@ -16,6 +16,9 @@ export class Bookmarks {
   })
   users : Users;
 
+  @Column()
+  user_id : number;
+
   @ManyToOne(() => Pools, (pools) => pools.bookmarks, {
     onDelete : "CASCADE"
   })
@@ -23,6 +26,9 @@ export class Bookmarks {
     name : "pool_id"
   })
   pools : Pools;
+
+  @Column()
+  pool_id : number;
 
   @CreateDateColumn({
     default : () => "CURRENT_TIMESTAMP"

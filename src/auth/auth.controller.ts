@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpException, HttpStatus, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, HttpCode, HttpException, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { CreateUsersDto } from "./dto/create-users.dto";
 import { AuthService } from "./auth.service";
 import { ApiBody, ApiCookieAuth, ApiNotAcceptableResponse, ApiProperty } from "@nestjs/swagger";
@@ -8,6 +8,7 @@ import { Request, Response } from "express";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { LoginDto } from "./dto/login.dto";
+import { JwtPayload } from "./dto/jwt-payload";
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -24,11 +25,13 @@ export class AuthController {
   }
 
   // 로그아웃 - 이것도 response.json() or end() 로 끝내야 한다.
+  @HttpCode(200)
   @Post("logout")
   async logout(@Res() response : Response) {
     await this.authService.clearAuthCookies(response);
 
     return response.json({
+      status : "success",
       message : "로그아웃 되었습니다."
     })
   }
@@ -49,7 +52,17 @@ export class AuthController {
   )
   @Post("register")
   async register(@Body() createUsersDto : CreateUsersDto) {
-    return await this.authService.register(createUsersDto);
+    const {id, email, nickname} = await this.authService.register(createUsersDto);
+
+    return {
+      status : "success",
+      message : "회원가입 성공",
+      data : {
+        user_id : id,
+        email : email,
+        nickname : nickname
+      }
+    }
   }
 
   // 비밀번호를 잊어버렸을 때 (이메일로 새 비밀번호 보내주기)
@@ -64,6 +77,7 @@ export class AuthController {
   }
 
   // 비밀번호 재설정
+  @HttpCode(200)
   @Post("reset-password")
   @ApiBody({
     type : ResetPasswordDto
@@ -71,11 +85,14 @@ export class AuthController {
   async resetPassword(@Body() resetPasswordDto : ResetPasswordDto, @Req() req : Request ) {
     const {password, newPassword} = resetPasswordDto;
 
-    const {id} = req["user"];
+    const jwtPayload : JwtPayload = req["user"];
 
-    await this.authService.resetPassword(password, newPassword, parseInt(id));
+    const {id} = jwtPayload
+
+    await this.authService.resetPassword(password, newPassword, id);
 
     return {
+      status : "success",
       message : "비밀번호 변경이 완료 되었습니다.",
     }
   }

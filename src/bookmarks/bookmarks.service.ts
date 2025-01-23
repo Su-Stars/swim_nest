@@ -1,33 +1,43 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { PostBookmarksDto } from "./dto/postBookmarks.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Bookmarks } from "./bookmarks.entity";
 import { Repository } from "typeorm";
 import { Users } from "../users/users.entity";
 import { Pools } from "../pools/pools.entity";
+import { PoolsService } from "../pools/pools.service";
 
 @Injectable()
 export class BookmarksService {
   constructor(
-    @InjectRepository(Bookmarks) private bookmarksRepository : Repository<Bookmarks>,
+    @InjectRepository(Bookmarks) private readonly bookmarksRepository : Repository<Bookmarks>,
+    @Inject(forwardRef(() => PoolsService))
+    private readonly poolsService : PoolsService
   ) {
   }
 
   async newBookmarks(id: number, poolId : number) {
+    // 없는 수영장인지 확인
+    const isExistPools = await this.poolsService.getByIdPool(poolId);
+
+    if(!isExistPools){
+      throw new HttpException({
+        status : "error",
+        message : "없는 수영장은 북마크 할 수 없습니다."
+      }, HttpStatus.NOT_FOUND)
+    }
+
 
     // 새로운 수영장 북마크 추가 전에, 이미 추가해 놨는지 확인하기 - 동일한 유저,수영장 쌍이 있다면, 안된다.
     const isAlreadyEntity = await this.bookmarksRepository.findOneBy({
-      users : {
-        id : id
-      },
-      pools : {
-        id : poolId
-      }
+      user_id : id,
+      pool_id : poolId
     })
 
     // 이미 등록했으므로, 예외 던지기
     if(isAlreadyEntity) {
       throw new HttpException({
+        status : "fail",
         message : "이미 등록한 수영장 북마크입니다."
       }, HttpStatus.CONFLICT)
     }
@@ -35,12 +45,8 @@ export class BookmarksService {
     // 릴레이션을 사용하기 위해서는 "user_id", "pool_id" 컬럼을 직접 입력하는 것이 아니라,
     // 엔티티 파일 내에서 해당 컬럼과 연결된 Users, Pools 엔티티에 옵션을 추가하는 방식으로 생성 및 검색한다.
     const newBookMarkEntity = this.bookmarksRepository.create({
-      users : {
-        id : id,
-      } as Users,
-      pools : {
-        id : poolId
-      } as Pools
+      user_id : id,
+      pool_id : poolId
     });
 
     // 새로운 북마크 엔티티를 저장한다.
@@ -54,9 +60,7 @@ export class BookmarksService {
     // typeorm 에서 where 절을 사용하는 방식, 릴레이션(디폴트 LeftJoin), 순서를 결정하는 방식이 특이하다고 생각한다.
     const bookmarkList = await this.bookmarksRepository.find({
       where : {
-        users : {
-          id : user_id
-        }
+        user_id : user_id
       },
       relations : {
         pools : true
@@ -87,11 +91,10 @@ export class BookmarksService {
   }
 
   async deleteMyBookmarks(user_id : number, bookmark_id : number) {
+
     const result = await this.bookmarksRepository.delete({
       id : bookmark_id,
-      users : {
-        id : user_id
-      }
+      user_id : user_id
     })
 
     if(result.affected === 0) {
@@ -102,5 +105,24 @@ export class BookmarksService {
     }
 
     return;
+  }
+
+  async isBookmarked(user_id : number, pool_id : number) {
+    const bookMarkPool = await this.bookmarksRepository.findOneBy({
+      user_id : user_id,
+      pool_id : pool_id
+    })
+
+    if(!bookMarkPool){
+      throw new HttpException({
+        status : "fail",
+        message : "북마크 되지 않은 수영장입니다",
+      }, HttpStatus.NOT_FOUND)
+    }
+
+    return {
+      bookId : bookMarkPool.id,
+      isBookMarked : bookMarkPool ? true : false,
+    }
   }
 }
