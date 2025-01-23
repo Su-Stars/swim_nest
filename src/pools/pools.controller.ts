@@ -3,12 +3,16 @@ import { PoolsService } from './pools.service';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
+import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 
 
 @Controller('api/v1/pools')
 export class PoolsController {
-    constructor(private poolsService: PoolsService) {}
-
+    constructor(
+        private poolsService: PoolsService,
+        private coordinateAPI: CoordinateApiService
+    ) {}
+    
     // 수영장 정보 조회
     @Get()
     @HttpCode(200)
@@ -41,7 +45,7 @@ export class PoolsController {
     // 관리자 수영장 수정
     @Patch('/:poolId')
     @HttpCode(200)
-    async adminUpdatePool (
+    async adminUpdatePool ( 
         @Req() req: Request,
         @Body() body: createPool,
         @Param('poolId', ParseIntPipe) poolId : number

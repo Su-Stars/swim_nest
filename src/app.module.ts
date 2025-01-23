@@ -12,7 +12,6 @@ import { Bookmarks } from "./bookmarks/bookmarks.entity";
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { SwimLogsModule } from './swim_logs/swim_logs.module';
 import * as process from "node:process";
-import { ImagesModule } from './images/images.module';
 import { Images } from './images/images.entity';
 import { SwimLogs } from "./swim_logs/swim_logs.entity";
 
@@ -36,7 +35,6 @@ import { SwimLogs } from "./swim_logs/swim_logs.entity";
     PoolsModule,
     BookmarksModule,
     SwimLogsModule,
-    ImagesModule
   ],
   controllers: [AppController],
   providers: [AppService],
