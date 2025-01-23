@@ -30,7 +30,7 @@ export class AuthService {
 
     if(isExistingEmail) {
       throw new HttpException({
-        status : "fail",
+        status : "error",
         message : "동일한 이메일을 가진 유저가 존재합니다."
       }, HttpStatus.NOT_ACCEPTABLE)
     }
@@ -93,6 +93,7 @@ export class AuthService {
     // 비밀번호가 틀림.
     if(!loginSuccess) {
       throw new HttpException({
+        status : "fail",
         message : "비밀번호가 틀렸습니다."
       }, HttpStatus.UNAUTHORIZED);
     }
@@ -112,8 +113,8 @@ export class AuthService {
     await this.setAuthCookies(response, {accessToken, refreshToken});
 
     return {
-      message : "로그인 성공했습니다.",
       status : "success",
+      message : "로그인 성공했습니다.",
       data : result,
     }
   }
@@ -245,6 +246,7 @@ export class AuthService {
     if(!isValidPwd) {
       throw new HttpException(
         {
+          status : "fail",
           message : "주어진 비밀번호가 일치하지 않습니다."
         },
         HttpStatus.BAD_REQUEST
