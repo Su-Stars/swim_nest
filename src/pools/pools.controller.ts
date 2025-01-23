@@ -48,7 +48,7 @@ export class PoolsController {
     async adminUpdatePool ( 
         @Req() req: Request,
         @Body() body: createPool,
-        @Param('poolId', ParseIntPipe) poolId: number
+        @Param('poolId', ParseIntPipe) poolId : number
     ) {
         return this.poolsService.adminUpdatePool(req, poolId, body)
     }
