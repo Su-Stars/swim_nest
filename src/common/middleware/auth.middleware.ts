@@ -48,6 +48,7 @@ export class AuthMiddleware implements NestMiddleware {
       // 결과적으로 리프레쉬 토큰으로 액세스 토큰을 새로 발급한 것이다.
       res.cookie("access_token", newAccessToken.accessToken, {
         httpOnly : true,
+        sameSite : "none",
         maxAge : 5 * 60 * 1000, // 5 분
       });
 
