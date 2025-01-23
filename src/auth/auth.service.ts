@@ -230,14 +230,14 @@ export class AuthService {
       });
     } catch (error) {
       return new HttpException({
-        message : "access_token 검증 중 실패",
+        message : "refresh_token 검증 중 실패",
         error : error,
       }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async verificationEmail(email : string) : Promise<boolean> {
-    const getUser = this.usersRepository.findOneBy({
+    const getUser = await this.usersRepository.findOneBy({
       email : email
     })
 
@@ -279,7 +279,7 @@ export class AuthService {
   private async checkPwd(users : Users, password : string) : Promise<boolean> {
     const salt = users.salt;
 
-    const hashedPwd = bcrypt.hashSync(password, salt);
+    const hashedPwd = await bcrypt.hash(password, salt);
 
     return users.password === hashedPwd;
   }
