@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { SwimLogs } from "../swim_logs/swim_logs.entity";
+import { Follows } from "../follows/follows.entity";
 
 @Entity()
 export class Users {
@@ -69,4 +70,7 @@ export class Users {
 
   @OneToMany(() => SwimLogs, (swimLog) => swimLog.users )
   swimLogs : SwimLogs[];
+
+  @OneToMany(() => Follows, (follow) => follow.users)
+  follows : Follows[];
 }

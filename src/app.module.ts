@@ -15,6 +15,8 @@ import * as process from "node:process";
 import { Images } from './images/images.entity';
 import { SwimLogs } from "./swim_logs/swim_logs.entity";
 import { ImagesModule } from './images/images.module';
+import { FollowsModule } from './follows/follows.module';
+import { Follows } from "./follows/follows.entity";
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { ImagesModule } from './images/images.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, poolImages],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, poolImages, Follows],
       synchronize: true,
       charset : "utf8mb4",
     }),
@@ -37,6 +39,7 @@ import { ImagesModule } from './images/images.module';
     ImagesModule,
     BookmarksModule,
     SwimLogsModule,
+    FollowsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
