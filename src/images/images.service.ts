@@ -67,7 +67,7 @@ export class ImagesService {
             
             const { identifiers } = await this.ImagesRepository.insert(data)
             
-            return identifiers[0].id
+            return {identifiers, data}
         } else {
             throw new NotFoundException(
                 "업로드 할 사진이 없습니다."

@@ -7,7 +7,7 @@ import {
     NotFoundException
 } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
-import { Pools } from './pools.entity';
+import { poolImages, Pools } from './pools.entity';
 import { Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
@@ -22,6 +22,10 @@ export class PoolsService {
     constructor(
         @InjectRepository(Pools)
         private PoolsRepository: Repository<Pools>,
+
+        @InjectRepository(poolImages)
+        private poolImagesRepository: Repository<poolImages>,
+
         private coordinateAPI: CoordinateApiService,
         private readonly bookmarksService : BookmarksService
     ) {}
@@ -208,4 +212,16 @@ export class PoolsService {
 
         return isBookmarked;
     }
-}   
+
+    async adminUploadImage (id: number, imageResult: any) {
+        const {identifiers, data} = imageResult
+
+        await this.poolImagesRepository.createQueryBuilder()
+        .insert()
+        .into(poolImages)
+        .values({
+            poolid: id,
+            image: identifiers[0].id
+        })
+    }
+}

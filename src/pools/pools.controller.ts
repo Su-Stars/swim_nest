@@ -37,7 +37,6 @@ export class PoolsController {
     ) {}
     
     // 수영장 정보 조회
-
     @Get()
     @HttpCode(200)
     getAllPools(
@@ -115,7 +114,10 @@ export class PoolsController {
         @Param('poolId', ParseIntPipe) id: number,
         @UploadedFile() file: Express.Multer.File
     ) {
-        this.imagesService.uploadImages(req, file, id)
+        if (await this.poolsService.getByIdPool(id)){
+            const imageResult: any = await this.imagesService.uploadImages(req, file, id)
+            return await this.poolsService.adminUploadImage(id, imageResult)
+        }
     }
 }
 
