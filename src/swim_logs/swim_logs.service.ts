@@ -5,6 +5,7 @@ import { SwimLogs } from "./swim_logs.entity";
 import { Between, Repository } from "typeorm";
 import { WriteSwimLogDto } from "./dto/writeSwimLog.dto";
 import { fullTimeToDate } from "../common/util/date-util";
+import { AdminSearchSwimLogsDto } from "./dto/adminSearchSwimLogs.dto";
 
 @Injectable()
 export class SwimLogsService {
@@ -82,5 +83,51 @@ export class SwimLogsService {
     }
 
     return returnLog;
+  }
+
+  async getUserLogs(dateQuery : AdminSearchSwimLogsDto) {
+
+    const {year, month, day} = dateQuery;
+
+    // 달이 없고, 날만 있다면, 잘못된 요청이 온 것.
+    if(!month && day) {
+        throw new HttpException({
+          status : "error",
+          message : "정확한 일자를 확인하기 위해서는 몇 월인지 알아야 합니다 - month 빠짐"
+        }, HttpStatus.BAD_REQUEST);
+    }
+
+    // 필터링 시작
+    // 연도만 있을 경우
+    let startDateStr;
+    let endDateStr;
+    if(!month && !day) {
+      const lastDay = new Date(year, 12, 0).getDate();
+      startDateStr = String(year) + "-01-01 00:00:00";
+      endDateStr = String(year) + "-12-" + String(lastDay) + " 23:59:59";
+    } else if(month && !day) { // 월 에 따른 결과물을 보고 싶을 경우,
+      const lastDay = new Date(year, month, 0).getDate();
+      startDateStr = String(year) + "-" + String(month) + "-01 00:00:00";
+      endDateStr = String(year) + "-" + String(month) + "-" + String(lastDay) + " 23:59:59";
+    } else { // 해당 날의 결과물을 보고 싶을 경우,
+      startDateStr = String(year) + "-" + String(month) + "-" + String(day) + " 00:00:00";
+      endDateStr = String(year) + "-" + String(month) + "-" + String(day) + " 23:59:59";
+    }
+
+    const userLogs = await this.swimLogsRepository.find({
+      where : {
+        swim_date : Between(startDateStr, endDateStr)
+      },
+      order : {
+        swim_date : "ASC"
+      }
+    });
+
+    const resultUserLogs = userLogs.map((log) => ({
+      ...log,
+      swim_date : fullTimeToDate(log.swim_date)
+    }))
+
+    return resultUserLogs;
   }
 }

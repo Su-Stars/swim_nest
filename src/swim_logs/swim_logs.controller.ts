@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  Req
+} from "@nestjs/common";
 import { Request } from "express";
 import { SwimLogQueryDto } from "./dto/swimLogQuery.dto";
 import { ApiBody, ApiCookieAuth, ApiQuery, ApiResponse } from "@nestjs/swagger";
@@ -6,6 +17,7 @@ import { JwtPayload } from "../auth/dto/jwt-payload";
 import { WriteSwimLogDto } from "./dto/writeSwimLog.dto";
 import { SwimLogsService } from "./swim_logs.service";
 import { SwimLogs } from "./swim_logs.entity";
+import { AdminSearchSwimLogsDto } from "./dto/adminSearchSwimLogs.dto";
 
 @ApiCookieAuth("access-cookie")
 @Controller("api/v1/logs")
@@ -28,6 +40,75 @@ export class SwimLogsController {
     return {
       status : "success",
       message : "수영기록이 저장되었습니다.",
+    }
+  }
+
+  @Get("user-logs")
+  async getUserLogs(@Query() adminSearchSwimLogsDto : AdminSearchSwimLogsDto, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {year, month, day} = adminSearchSwimLogsDto;
+
+    const {role} = jwtPayload;
+
+    if(role !== "admin") {
+      throw new HttpException({
+        "status" : "error",
+        "message" : "관리자가 아니면, 유저의 활동 기록을 볼 수 없습니다."
+      }, HttpStatus.FORBIDDEN);
+    }
+
+    const userLogs = await this.swimLogsService.getUserLogs(adminSearchSwimLogsDto);
+
+    let totalSwimLength = 0;
+
+    let userSet = new Set<number>();
+
+    const groupDate = userLogs.reduce((store, record) => {
+      const userId = record.user_id;
+      const swimLength = record.swim_length;
+      const date = record.swim_date;
+
+      // 만약 Set 에 유저가 없었다면, 새로운 유저 등록
+      if(!userSet.has(userId)) {
+        userSet.add(userId);
+      }
+
+      // 모든 유저의 수영 총량 추가
+      totalSwimLength += swimLength;
+
+      // 누산 객체에 해당 날짜의 key 가 없다면, 해당 날짜로 배열을 만들어 준다.
+      if(!store[date]) {
+        store[date] = [];
+      }
+
+      store[date].push({
+        logId : record.id,
+        userId : record.user_id,
+        startTime : record.start_time,
+        endTime : record.end_time,
+        laneLength : record.lane_length,
+        swimCategory : record.swim_category,
+        swimLength : record.swim_length,
+        note : record.note,
+        created_at : record.created_at
+      });
+
+      return store;
+    }, {} as Record<string, any[]>);
+
+
+    return {
+      status : "success",
+      message : userLogs.length === 0 ? "해당 기간에 유저 로그가 없습니다." : "유저 수영 기록 조회에 성공했습니다.",
+      data : {
+        year : year,
+        month : month,
+        day : day,
+        userNumber : userSet.size,
+        userTotalLength : totalSwimLength,
+        record : groupDate
+      }
     }
   }
 
