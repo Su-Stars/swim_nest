@@ -53,8 +53,9 @@ export class AuthMiddleware implements NestMiddleware {
         maxAge : 5 * 60 * 1000, // 5 분
       });
 
-      // 새로 생성된 access 토큰으로 컨트롤러에 넘겨줄 "user" 속성 정의
-      req["user"] = await this.authService.validateAccessToken(accessToken);
+      // 아주 가끔씩 JS 엔진의 동기적 운용으로 인해 req["user"] 가 할당되기 전에, 컨트롤러 핸들러 메서드에서 먼저 req["user"] 를 조회하는 일이 발생.
+      // 따라서, 이미 값이 존재하는 리프레쉬 토큰으로 바로 할당. - 어짜피 refresh 가 만료되지 않았다는 것은, 인증된 사용자라는 의미 (access < refresh)
+      req["user"] = tokenPayload;
 
       // access, refresh 두 토큰 모두 살아 있는 상황.
     } else {

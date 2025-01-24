@@ -1,9 +1,8 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 
-// 연도(4자리) 와 월(1~12) 는 필수. 그리고 날짜는 선택(1 ~ 31)
-export class SwimLogQueryDto {
+export class AdminSearchSwimLogsDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsInt()
@@ -11,7 +10,7 @@ export class SwimLogQueryDto {
   year : number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
   @Type(() => Number)
   month : number;
