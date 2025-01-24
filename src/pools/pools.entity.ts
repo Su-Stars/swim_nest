@@ -83,7 +83,7 @@ export class Pools{
     bookmarks : Bookmarks[];
 
     @OneToMany(() => poolImages, (poolimages) => poolimages.poolid)
-    pools: Pools
+    pools: Pools[];
 }
 
 
@@ -101,7 +101,7 @@ export class poolImages {
     poolid: poolImages
 
     @Column()
-    pool_id: number    
+    pool_id: number
 
     @ManyToOne(() => Images, (images) => images.imagesId, {
         onDelete : "CASCADE"

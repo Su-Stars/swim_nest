@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { poolImages, Pools } from './pools.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
@@ -34,7 +34,28 @@ export class PoolsService {
     // Pool 전체 조회
     async getAllPools(query: GetQueryData): Promise<any> {
         const {page, limit, region, keyword} = query;
+
         
+        const pools = await this.PoolsRepository.find({
+            select: ['id', 'name', 'address'],
+            take: limit,
+            skip: (page -1) * limit,
+        })
+
+        const poolImages = await this.poolImagesRepository.find({
+            where: { pool_id: In(pools.map(pools => pools.id)) }, 
+            relations: ['image'],  
+          });
+
+        //   const groupByPoolId = poolImages.reduce((restore, poolImage) => {
+        //     if (!restore[poolImage.pool_id]) {
+        //         restore[poolImage.pool_id] = poolImage.image_id
+        //     }
+        //     return restore
+        //   }) 
+          console.log(poolImages)
+
+
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
             return {
@@ -44,11 +65,6 @@ export class PoolsService {
                     total: await this.PoolsRepository.count(),
                     page,
                     limit,
-                    pools: await this.PoolsRepository.find({
-                        select: ['id', 'name', 'address'],
-                        take: limit,
-                        skip: (page -1) * limit,
-                    })
                 }
             }
         }
@@ -233,7 +249,7 @@ export class PoolsService {
             mimeType: data.mimetype,
             uploadedAt: generatedMaps[0].uploaded_at
         }
-        
+
         return {
             status: "success",
             message: "이미지 업로드에 성공했습니다.",
