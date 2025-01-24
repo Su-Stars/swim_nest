@@ -17,7 +17,7 @@ import { AuthService } from "../auth/auth.service";
   exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  async configure(consumer: MiddlewareConsumer) {
     consumer
       // 쿠키 기반의 인증 적용
       .apply(AuthMiddleware)

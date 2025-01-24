@@ -13,7 +13,7 @@ import { AuthMiddleware } from "../common/middleware/auth.middleware";
   exports: [SwimLogsService, TypeOrmModule],
 })
 export class SwimLogsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  async configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
       .forRoutes(SwimLogsController)

@@ -31,7 +31,7 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
   exports: [PoolsService, CoordinateApiService, TypeOrmModule, ]
 })
 export class PoolsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  async configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
       .exclude(
