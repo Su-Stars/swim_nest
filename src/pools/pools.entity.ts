@@ -100,6 +100,9 @@ export class poolImages {
     })
     poolid: poolImages
 
+    @Column()
+    pool_id: number    
+
     @ManyToOne(() => Images, (images) => images.imagesId, {
         onDelete : "CASCADE"
     })
@@ -107,5 +110,8 @@ export class poolImages {
         name: "image_id"
     })
     image: poolImages
+
+    @Column()
+    image_id: number
 
 }

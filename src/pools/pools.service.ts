@@ -17,6 +17,7 @@ import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { updatePool } from './dto/updatePool.dto';
 
+
 @Injectable()
 export class PoolsService {
     constructor(
@@ -214,14 +215,29 @@ export class PoolsService {
     }
 
     async adminUploadImage (id: number, imageResult: any) {
-        const {identifiers, data} = imageResult
+        const {identifiers, data, generatedMaps} = imageResult
 
         await this.poolImagesRepository.createQueryBuilder()
         .insert()
         .into(poolImages)
         .values({
-            poolid: id,
-            image: identifiers[0].id
+            pool_id: id,
+            image_id: identifiers[0].id
         })
+        .execute();
+
+        const replace = {
+            imageUrl: data.url,
+            fileName: data.filename,
+            fileSize: data.size,
+            mimeType: data.mimetype,
+            uploadedAt: generatedMaps[0].uploaded_at
+        }
+        
+        return {
+            status: "success",
+            message: "이미지 업로드에 성공했습니다.",
+            data: replace
+        }
     }
 }
