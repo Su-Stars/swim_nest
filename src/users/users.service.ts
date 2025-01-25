@@ -27,8 +27,6 @@ export class UsersService {
 
   async editMyInfo(id : number, editInfo : EditUserInfoDto) {
 
-    console.log(editInfo);
-
     // 만약 요청 객체에 어떠한 사항도 담겨있지 않다면, (editObj) 에 어떠한 정보도 없음을 가정 - 수정해야함
     if(!editInfo) {
       throw new HttpException(

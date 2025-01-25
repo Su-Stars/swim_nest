@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller,
+  Controller, Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -25,6 +25,7 @@ export class SwimLogsController {
   constructor(private readonly swimLogsService : SwimLogsService) {
   }
 
+  // 내 수영기록 저장
   @ApiBody({
     type : WriteSwimLogDto,
   })
@@ -43,6 +44,7 @@ export class SwimLogsController {
     }
   }
 
+  // 관리자는 유저의 수영 기록을 관찰 할 수 있다.
   @Get("user-logs")
   async getUserLogs(@Query() adminSearchSwimLogsDto : AdminSearchSwimLogsDto, @Req() req : Request) {
     const jwtPayload : JwtPayload = req["user"];
@@ -112,6 +114,43 @@ export class SwimLogsController {
     }
   }
 
+  // 나의 특정 수영기록 조회 - 수영 로그 id 로.
+  @Get(":log_id")
+  async getMyLog(@Param("log_id", ParseIntPipe) log_id : number, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    const swim_log = await this.swimLogsService.getMyLog(id, log_id);
+
+    return {
+      status : "success",
+      message : "나의 특정 수영활동 기록 조회 성공!",
+      data : swim_log
+    }
+  }
+
+  // 사용자는 자신의 수영 기록 하나씩 삭제 할 수 있다 - Param(log_id) 필요
+  @Delete(":log_id")
+  async deleteMyLog(@Param("log_id", ParseIntPipe) log_id : number, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    // 기록 삭제 진행
+    const deletedLog = await this.swimLogsService.deleteMyLog(log_id, id);
+
+    return {
+      status : "success",
+      message : "수영 기록을 삭제하는데 성공했습니다.",
+      data : {
+        ...deletedLog
+      }
+    }
+  }
+
+  // year(required), month(required), day(optional) - 사용자는 연도,월, 일 을 기준으로 자신의 수영 기록을 가져올 수 있다.
+  // (달력으로 보여준다 가정)
   @Get()
   @ApiQuery({
     name : "year",
@@ -122,7 +161,8 @@ export class SwimLogsController {
   @ApiQuery({
     name : "month",
     description : "1 ~ 12 월 중 하나",
-    example : "12"
+    example : "12",
+    required : true
   })
   @ApiQuery({
     name : "day",
@@ -179,18 +219,4 @@ export class SwimLogsController {
     }
   }
 
-  @Get(":log_id")
-  async getMyLog(@Param("log_id", ParseIntPipe) log_id : number, @Req() req : Request) {
-    const jwtPayload : JwtPayload = req["user"];
-
-    const {id} = jwtPayload;
-
-    const swim_log = await this.swimLogsService.getMyLog(id, log_id);
-
-    return {
-      status : "success",
-      message : "나의 특정 수영활동 기록 조회 성공!",
-      data : swim_log
-    }
-  }
 }
