@@ -47,13 +47,11 @@ export class PoolsService {
             relations: ['image'],  
           });
 
-        //   const groupByPoolId = poolImages.reduce((restore, poolImage) => {
-        //     if (!restore[poolImage.pool_id]) {
-        //         restore[poolImage.pool_id] = poolImage.image_id
-        //     }
-        //     return restore
-        //   }) 
-          console.log(poolImages)
+          const uniqueArr = poolImages.filter((item, index, self) => {
+            return  self.findIndex((el) => el.pool_id === item.pool_id) === index;
+          })
+
+         
 
 
         // 전체 조회
