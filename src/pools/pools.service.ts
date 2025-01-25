@@ -47,7 +47,7 @@ export class PoolsService {
             relations: ['image'],  
           });
 
-          const uniqueArr = poolImages.filter((item, index, self) => {
+        const uniqueArr = poolImages.filter((item, index, self) => {
             return  self.findIndex((el) => el.pool_id === item.pool_id) === index;
           })
 
