@@ -8,7 +8,7 @@ import {
 import { PoolsController } from './pools.controller';
 import { PoolsService } from './pools.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Pools } from './pools.entity';
+import { poolImages, Pools } from './pools.entity';
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { HttpModule } from '@nestjs/axios';
 import { AuthMiddleware } from 'src/common/middleware/auth.middleware';
@@ -19,7 +19,7 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Pools]),
+    TypeOrmModule.forFeature([Pools, poolImages]),
     HttpModule,
     AuthModule,
     ImagesModule,

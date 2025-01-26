@@ -7,8 +7,8 @@ import {
     NotFoundException
 } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
-import { Pools } from './pools.entity';
-import { Repository } from 'typeorm';
+import { poolImages, Pools } from './pools.entity';
+import { In, Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
@@ -17,11 +17,16 @@ import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { updatePool } from './dto/updatePool.dto';
 
+
 @Injectable()
 export class PoolsService {
     constructor(
         @InjectRepository(Pools)
         private PoolsRepository: Repository<Pools>,
+
+        @InjectRepository(poolImages)
+        private poolImagesRepository: Repository<poolImages>,
+
         private coordinateAPI: CoordinateApiService,
         private readonly bookmarksService : BookmarksService
     ) {}
@@ -29,7 +34,26 @@ export class PoolsService {
     // Pool 전체 조회
     async getAllPools(query: GetQueryData): Promise<any> {
         const {page, limit, region, keyword} = query;
+
         
+        const pools = await this.PoolsRepository.find({
+            select: ['id', 'name', 'address'],
+            take: limit,
+            skip: (page -1) * limit,
+        })
+
+        const poolImages = await this.poolImagesRepository.find({
+            where: { pool_id: In(pools.map(pools => pools.id)) }, 
+            relations: ['image'],  
+          });
+
+        const uniqueArr = poolImages.filter((item, index, self) => {
+            return  self.findIndex((el) => el.pool_id === item.pool_id) === index;
+          })
+
+         
+
+
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
             return {
@@ -39,11 +63,6 @@ export class PoolsService {
                     total: await this.PoolsRepository.count(),
                     page,
                     limit,
-                    pools: await this.PoolsRepository.find({
-                        select: ['id', 'name', 'address'],
-                        take: limit,
-                        skip: (page -1) * limit,
-                    })
                 }
             }
         }
@@ -208,4 +227,31 @@ export class PoolsService {
 
         return isBookmarked;
     }
-}   
+
+    async adminUploadImage (id: number, imageResult: any) {
+        const {identifiers, data, generatedMaps} = imageResult
+
+        await this.poolImagesRepository.createQueryBuilder()
+        .insert()
+        .into(poolImages)
+        .values({
+            pool_id: id,
+            image_id: identifiers[0].id
+        })
+        .execute();
+
+        const replace = {
+            imageUrl: data.url,
+            fileName: data.filename,
+            fileSize: data.size,
+            mimeType: data.mimetype,
+            uploadedAt: generatedMaps[0].uploaded_at
+        }
+
+        return {
+            status: "success",
+            message: "이미지 업로드에 성공했습니다.",
+            data: replace
+        }
+    }
+}

@@ -65,9 +65,9 @@ export class ImagesService {
                 mimetype
             }
             
-            const { identifiers } = await this.ImagesRepository.insert(data)
+            const { identifiers, generatedMaps } = await this.ImagesRepository.insert(data)
             
-            return identifiers[0].id
+            return {identifiers, data, generatedMaps}
         } else {
             throw new NotFoundException(
                 "업로드 할 사진이 없습니다."
