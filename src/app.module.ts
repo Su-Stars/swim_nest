@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PoolsModule } from './pools/pools.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { poolImages, Pools } from './pools/pools.entity';
+import { PoolImages, Pools } from './pools/pools.entity';
 import { Users } from "./users/users.entity";
 import { Bookmarks } from "./bookmarks/bookmarks.entity";
 import { BookmarksModule } from './bookmarks/bookmarks.module';
@@ -26,7 +26,7 @@ import { ImagesModule } from './images/images.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, poolImages],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages],
       synchronize: true,
       charset : "utf8mb4",
     }),

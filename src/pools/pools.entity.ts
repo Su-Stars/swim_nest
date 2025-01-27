@@ -1,13 +1,13 @@
-import { 
-    Column, 
-    CreateDateColumn, 
-    Entity, 
-    Index, 
-    JoinColumn, 
-    ManyToOne, 
-    OneToMany, 
-    PrimaryGeneratedColumn, 
-    UpdateDateColumn 
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    OneToMany, OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
 } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { Images } from "src/images/images.entity";
@@ -82,36 +82,38 @@ export class Pools{
     @OneToMany(() => Bookmarks, (bookmark) => bookmark.pools)
     bookmarks : Bookmarks[];
 
-    @OneToMany(() => poolImages, (poolimages) => poolimages.poolid)
-    pools: Pools[];
+    @OneToMany(() => PoolImages, (poolImages) => poolImages.pools)
+    poolImages: PoolImages[];
 }
 
 
 @Entity()
-export class poolImages {
+export class PoolImages {
     @PrimaryGeneratedColumn()
     id: number
 
-    @ManyToOne(() => Pools, (pools) => pools.pools, {
+    // pools 엔티티는 여러 개의 PoolImages 엔티티를 가질 수 있다 - 관계도 (Pools <-- PoolImages)
+    @ManyToOne(() => Pools, (pools) => pools.poolImages, {
         onDelete : "CASCADE"
     })
     @JoinColumn({
         name: 'pool_id'
     })
-    poolid: poolImages
+    pools : Pools
 
     @Column()
     pool_id: number
 
-    @ManyToOne(() => Images, (images) => images.imagesId, {
+    // Images 엔티티는 하나의 PoolImages 와 연결된다 - 관계도 (PoolImages <--> Images)
+    // 즉, pool_images 테이블은 1대1 관계로서 images 의 PK 를 FK 로 가지므로, images 를 등록 후, pool_images 로 등록해야 한다.
+    @OneToOne(() => Images, (images) => images.poolImage, {
         onDelete : "CASCADE"
     })
     @JoinColumn({
         name: "image_id"
     })
-    image: poolImages
+    image: Images
 
     @Column()
     image_id: number
-
 }
