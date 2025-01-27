@@ -27,19 +27,54 @@ import { updatePool } from './dto/updatePool.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
+import { BookmarksService } from "../bookmarks/bookmarks.service";
 
 
 @Controller('api/v1/pools')
 export class PoolsController {
     constructor(
         private poolsService: PoolsService,
-        private imagesService: ImagesService
+        private imagesService: ImagesService,
     ) {}
+
+    // poolId 를 파라미터로 받고, 유저의 파라미터에 추가
+    @Post(":pool_id/bookmark")
+    @HttpCode(HttpStatus.CREATED) // 201
+    async addToMyBookmarks(@Param("pool_id", ParseIntPipe) pool_id : number, @Req() req : Request) {
+        const jwtPayload : JwtPayload = req["user"];
+
+        const {id} = jwtPayload;
+
+        const bookmark = await this.poolsService.addToMyBookmark(id, pool_id);
+
+        return {
+            status : "success",
+            message : "해당 수영장이 내 수영장 목록에 추가되었습니다.",
+            data : {
+                bookmark_id : bookmark.id
+            }
+        }
+    }
+
+    @Delete(":pool_id/bookmark")
+    @HttpCode(HttpStatus.CREATED) // 정석은 ACCEPTED 인듯 (202)
+    async deleteMyBookmarks(@Param("pool_id", ParseIntPipe) pool_id : number, @Req() req : Request) {
+        const jwtPayload : JwtPayload = req["user"];
+
+        const {id} = jwtPayload;
+
+        await this.poolsService.deleteMyBookmark(id, pool_id);
+
+        return {
+            status : "success",
+            message : "수영장이 내 수영장 목록에 제거되었습니다."
+        }
+    }
     
     // 수영장 정보 조회
     @Get()
     @HttpCode(200)
-    getAllPools(
+    async getAllPools(
         @Query() query: GetQueryData,
         @Req() req : Request
     ): Promise<any> {
@@ -77,9 +112,9 @@ export class PoolsController {
     }
 
     // 로그인이 되어 있는 상태에서, 해당 수영장이 내가 북마크 한 수영장인지 확인하여 반환한다.
-    @Get(":poolId/bookmarked")
+    @Get(":pool_id/bookmark")
     @HttpCode(HttpStatus.OK)
-    async isBookmarked(@Param("poolId", ParseIntPipe) poolId : number, @Req() req : Request) {
+    async isBookmarked(@Param("pool_id", ParseIntPipe) poolId : number, @Req() req : Request) {
         const jwtPayload : JwtPayload = req["user"];
 
         const {id} = jwtPayload;
@@ -89,8 +124,10 @@ export class PoolsController {
 
         return {
             status : "success",
-            message : "북마크 되어 있습니다.",
-            data : isMarkedObj
+            data : {
+                is_bookmarked : isMarkedObj.isBookMarked,
+                bookmark_id : isMarkedObj.bookId
+            }
         }
     }
 
