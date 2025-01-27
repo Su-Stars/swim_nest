@@ -40,9 +40,10 @@ export class PoolsController {
     @Get()
     @HttpCode(200)
     getAllPools(
-        @Query() query: GetQueryData
+        @Query() query: GetQueryData,
+        @Req() req : Request
     ): Promise<any> {
-        return this.poolsService.getAllPools(query)
+        return this.poolsService.getAllPools(query, req)
     }
 
     // 개별 수영장 조회
