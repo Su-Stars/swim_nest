@@ -113,15 +113,9 @@ export class BookmarksService {
       pool_id : pool_id
     })
 
-    if(!bookMarkPool){
-      throw new HttpException({
-        status : "fail",
-        message : "북마크 되지 않은 수영장입니다",
-      }, HttpStatus.NOT_FOUND)
-    }
 
     return {
-      bookId : bookMarkPool.id,
+      bookId : bookMarkPool ? bookMarkPool.id : null,
       isBookMarked : bookMarkPool ? true : false,
     }
   }

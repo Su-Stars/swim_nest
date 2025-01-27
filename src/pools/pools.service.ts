@@ -35,6 +35,57 @@ export class PoolsService {
         private readonly authService : AuthService,
     ) {}
 
+    async addToMyBookmark(user_id : number, pool_id : number) {
+        const isExistPools = await this.PoolsRepository.exists({
+            where : {
+                id : pool_id
+            }
+        })
+
+        // invalid 한 수영장 번호 입력 시 404 반환
+        if(!isExistPools) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.NOT_FOUND)
+        }
+
+        // 북마크가 있다면, 반환되며, 이미 북마크 하였다면, 409 예외를 반환
+        const bookmark = await this.bookmarksService.newBookmarks(user_id, pool_id);
+
+        return bookmark;
+    }
+
+    async deleteMyBookmark(user_id : number, pool_id : number) {
+        // 존재하는 수영장인지 확인
+        const isExistPool = await this.PoolsRepository.exists({
+            where : {
+                id : pool_id
+            }
+        });
+
+        // 없는 수영자이면 404 반환
+        if(!isExistPool) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.NOT_FOUND)
+        }
+
+        // 북마크가 되어 있는 건지 확인
+        const bookmark = await this.bookmarksService.isBookmarked(user_id, pool_id);
+
+        // 이미 북마크 해제했거나, 아예 북마크를 한 적이 없다면, 406 반환
+        if(!bookmark.isBookMarked){
+            throw new HttpException({
+                status : "error",
+                message : "없는 북마크를 삭제 할 수 없습니다."
+            }, HttpStatus.NOT_ACCEPTABLE)
+        }
+
+        await this.bookmarksService.deleteMyBookmarks(user_id, bookmark.bookId)
+    }
+
     // Pool 전체 조회
     async getAllPools(query: GetQueryData, req : Request): Promise<any> {
         let {page, limit, region, keyword} = query;
@@ -270,8 +321,8 @@ export class PoolsService {
 
 
         if (body.address) {
-            const {address} : updatePool = body
-            const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+            const {address} : updatePool = body;
+            const { longtitude, latitude } = await this.coordinateAPI.fechData(address);
 
             await this.PoolsRepository.update({id: poolId}, {...body, longtitude, latitude})
             return {
@@ -318,7 +369,7 @@ export class PoolsService {
             throw new HttpException({
                 status : "error",
                 message : "존재하지 않는 수영장 번호를 입력하셨습니다."
-            }, HttpStatus.BAD_REQUEST)
+            }, HttpStatus.NOT_FOUND)
         }
 
         const isBookmarked = await this.bookmarksService.isBookmarked(user_id, pool_id);
