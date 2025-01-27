@@ -71,6 +71,6 @@ export class Users {
   @OneToMany(() => SwimLogs, (swimLog) => swimLog.users )
   swimLogs : SwimLogs[];
 
-  @OneToMany(() => Reviews, (reviews) => reviews.reviews_user_id)
+  @OneToMany(() => Reviews, (reviews) => reviews.users )
   reviews : Reviews[];
 }

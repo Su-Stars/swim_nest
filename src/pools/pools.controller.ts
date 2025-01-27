@@ -27,13 +27,16 @@ import { updatePool } from './dto/updatePool.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
+import { createReviews } from "src/reviews/dto/createReviews.dto";
+import { ReviewsService } from "src/reviews/reviews.service";
 
 
 @Controller('api/v1/pools')
 export class PoolsController {
     constructor(
         private poolsService: PoolsService,
-        private imagesService: ImagesService
+        private imagesService: ImagesService,
+        private reviewsService: ReviewsService
     ) {}
     
     // 수영장 정보 조회
@@ -120,13 +123,25 @@ export class PoolsController {
         }
     }
 
-    @Get('test/reviews')
+    // 리뷰 조회
+    @Get('/test/:poolId/reviews')
     @HttpCode(200)
     async getAllPoolsReviews (
         @Param('poolId') poolId: number,
         @Query() query: GetQueryData
     ) {
-        console.log(await this.getAllPoolsReviews(poolId, query))
+        return await this.reviewsService.getAllPoolsReviews(poolId, query)
+    }
+
+    // 리뷰 추가가
+    @Post('/test/:poolId/reviews')
+    @HttpCode(200)
+    async addPoolsReviews (
+        @Param('poolId') poolId: number,
+        @Body() body: createReviews,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.addPoolsReviews(poolId, body, req)
     }
 }
 

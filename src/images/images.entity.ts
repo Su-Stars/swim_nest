@@ -1,10 +1,10 @@
-import { poolImages } from "src/pools/pools.entity";
-import { 
-    Column, 
+import { PoolImages } from "src/pools/pools.entity";
+import {
+    Column,
     CreateDateColumn,
-    Entity, 
-    OneToMany, 
-    PrimaryGeneratedColumn 
+    Entity,
+    OneToMany, OneToOne,
+    PrimaryGeneratedColumn
 } from "typeorm";
 
 @Entity()
@@ -27,6 +27,6 @@ export class Images {
     @CreateDateColumn()
     uploaded_at: Date;
 
-    @OneToMany(() => poolImages, (poolimages) => poolimages.poolimages_image_id)
-    poolimages: poolImages[];
+    @OneToOne(() => PoolImages, (poolImages) => poolImages.image)
+    poolImage : PoolImages
 }

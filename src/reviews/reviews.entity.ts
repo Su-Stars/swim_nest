@@ -1,6 +1,6 @@
 import { Pools } from "src/pools/pools.entity";
 import { Users } from "src/users/users.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Reviews {
@@ -13,10 +13,10 @@ export class Reviews {
     @JoinColumn({
         name: "pool_id"
     })
-    reviews_pool_id: Pools;
+    pools: Pools;
 
-    @Column()
-    pool_id: number;
+    @Column({name: "pool_id"})
+    poolId: number;
 
     @ManyToOne(() => Users, (users) => users.reviews, {
         onDelete: "CASCADE"
@@ -24,7 +24,7 @@ export class Reviews {
     @JoinColumn({
         name: "user_id"
     })
-    reviews_user_id: Users;
+    users: Users;
 
     @Column({name: "user_id"})
     userId: number;
@@ -35,10 +35,15 @@ export class Reviews {
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
 
-    @UpdateDateColumn({ type: "timestamp", nullable: true, default: null })
+    @Column({ type: "timestamp", nullable: true, default: null })
     updatedAt: Date | null;
 
-    @OneToMany(() => Review_Keywords, (review_keywords) => review_keywords.review_keywords_reviews_id)
+    @BeforeUpdate()
+    updateTimestamp() {
+        this.updatedAt = new Date();
+    }
+
+    @OneToMany(() => Review_Keywords, (review_keywords) => review_keywords.reviews)
     review_keywords: Review_Keywords[];
 }
 
@@ -50,7 +55,7 @@ export class Keyword {
     @Column({ unique: true })
     keyword: string;
 
-    @OneToMany(() => Review_Keywords, (review_keywords) => review_keywords.review_keywords_keyword_id)
+    @OneToMany(() => Review_Keywords, (review_keywords) => review_keywords.keyword)
     review_keywords: Review_Keywords[];
 }
 
@@ -66,7 +71,7 @@ export class Review_Keywords {
     @JoinColumn({
         name: "review_id"
     })
-    review_keywords_reviews_id: Reviews
+    reviews: Reviews
 
     @Column()
     review_id: number
@@ -79,7 +84,7 @@ export class Review_Keywords {
     @JoinColumn({
         name: "keyword_id"
     })
-    review_keywords_keyword_id: Keyword
+    keyword: Keyword
     
     @Column()
     keyword_id: number;
