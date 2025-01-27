@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { PoolImages, Pools } from './pools.entity';
-import { In, Repository } from 'typeorm';
+import { FindOperator, FindOptionsWhere, In, Like, Repository } from "typeorm";
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
@@ -16,6 +16,8 @@ import { JwtPayload } from 'src/auth/dto/jwt-payload';
 import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
 import { updatePool } from './dto/updatePool.dto';
+import { AuthService } from "../auth/auth.service";
+import { Bookmarks } from "../bookmarks/bookmarks.entity";
 
 
 @Injectable()
@@ -28,36 +30,33 @@ export class PoolsService {
         private poolImagesRepository: Repository<PoolImages>,
 
         private coordinateAPI: CoordinateApiService,
-        private readonly bookmarksService : BookmarksService
+        private readonly bookmarksService : BookmarksService,
+
+        private readonly authService : AuthService,
     ) {}
 
     // Pool 전체 조회
-    async getAllPools(query: GetQueryData): Promise<any> {
-        const {page, limit, region, keyword} = query;
+    async getAllPools(query: GetQueryData, req : Request): Promise<any> {
+        let {page, limit, region, keyword} = query;
 
+        // 유저가 북마크 해 둔 수영장이 없다면, 빈 배열을 유지한다.
+        let userBookmarkPoolIds : number[] = [];
 
+        if(req.cookies["refresh_token"]) {
+            const refresh : string = req.cookies["refresh_token"];
 
+            const {id} = await this.authService.validateRefreshToken(refresh.replace("Bearer", ""));
 
-        /*
-        // 아마 모든 수영장에 대한 조회가 들어왔을 때, 그에 대한 반환을 하려고 시도하신 듯.
-        const pools = await this.PoolsRepository.find({
-            select: ['id', 'name', 'address'],
-            take: limit,
-            skip: (page -1) * limit,
-        })
+            const bookmarks = await this.bookmarksService.getMyBookmarks(id);
 
-        //
-        const poolImages = await this.poolImagesRepository.find({
-            where: { pool_id: In(pools.map(pools => pools.id)) },
-            relations: ['image'],
-          });
+            // 유저의 북마크 반환 형태에서, 수영장 ID 만 추출하여 반환.
 
-        const uniqueArr = poolImages.filter((item, index, self) => {
-            return  self.findIndex((el) => el.pool_id === item.pool_id) === index;
-          })
-
-         */
-
+            if(bookmarks.length !== 0) {
+                userBookmarkPoolIds = bookmarks.map((bookmark) => {
+                    return bookmark.pool.id
+                })
+            }
+        }
 
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
@@ -68,50 +67,131 @@ export class PoolsService {
                 relations : {
                     poolImages : {
                         image : true
-                    }
+                    },
                 }
             });
 
+            const poolAndThumbnail = searchAllPools.map((pool) => {
+                const {id, name, address, poolImages} = pool;
 
+                let thumbnail = undefined;
+                let isBookMarked = false;
+
+                // 해당 수영장에 대한 사진이 있다면, 첫 번째를 골라 제공하겠다.
+                if(poolImages.length !== 0) {
+                    thumbnail = poolImages[0].image.url;
+                }
+                if(userBookmarkPoolIds.includes(id)){
+                    isBookMarked = true;
+                }
+
+                return {
+                    id : id,
+                    name : name,
+                    address : address,
+                    thumbnail,
+                    isBookMarked
+                }
+            })
 
             return {
                 status: "success",
-                message: "지역별 수영장 목록 조회 성공",
+                message: "전체 수영장 목록 조회 성공",
                 data: {
                     total: await this.PoolsRepository.count(),
                     page,
                     limit,
+                    pools : poolAndThumbnail
                 }
             }
         }
 
-        // 문의 바람
-        const search = (region + ' ' + keyword).replace(/\ball\b/g, '').trim().replace(/\S+/g, "+$&");
-        
-        // 지역 별 조회
-        const regionData = await this.PoolsRepository.query(
-            `SELECT id, name, address FROM pools
-            WHERE MATCH(address, name) AGAINST (? IN BOOLEAN MODE)`,
-            [search]
-        );
+        region = region === "all" ? null : region;
+        keyword = keyword === "all" ? null : keyword;
 
-        if (regionData.length > 0) {
-            return {
-                stauts: "success",
-                message: "지역별 수영장 목록 조회 성공",
-                data: {
-                    total: regionData.length,
-                    page,
-                    limit,
-                    pools: await this.PoolsRepository.query(`
-                        SELECT id, name, address FROM pools
-                        WHERE MATCH(address, name) AGAINST (? IN BOOLEAN MODE)
-                        LIMIT ? OFFSET ?
-                        `, [search, Number(limit), Number((page - 1) * limit)])
-                }
+        // region 혹은 keyword 가 비어있지 않은 경우.
+        let addressTokens : string[] = [];
+
+        // 받아온 지역 정보의 문자열 앞뒤 빈 문자열을 지우고, 빈 칸으로 나눈다.
+        addressTokens = region.trim().split(" ");
+
+        // 이건 오류 예방인데, 지역 간 띄어쓰기가 2칸, 3칸일 때를 대비.
+        addressTokens = addressTokens.map((token) => {
+            // "경기도 " 이런 식으로 나뉘어 졌다면, "경기도" 로 만들어주는 작업.
+            return token.trim();
+        })
+
+        let addressSearch= "%";
+
+        // "%서울%서초%" 이러한 형식으로 구성 - LIKE 사용할 것이므로
+        for(let token of addressTokens) {
+            addressSearch += (token + "%");
         }
-        } else {
-            throw new NotFoundException();
+
+        const whereOption :  FindOptionsWhere<Pools> | FindOptionsWhere<Pools>[] = {}
+
+        // 지역 검색 문자열이 존재했다면
+        if(region){
+            whereOption.address = Like(addressSearch)
+        }
+
+        // 키워드 (수영장 이름) 이 존재했다면,
+        if(keyword) {
+            const searchName = `%${keyword}%`
+            whereOption.name = Like(searchName);
+        }
+
+        const [searchAllPools, totalNumber]  = await this.PoolsRepository.findAndCount({
+            select: ['id', 'name', 'address'],
+            take: limit,
+            skip: (page -1) * limit,
+            relations : {
+                poolImages : {
+                    image : true
+                }
+            },
+            where : whereOption
+        });
+
+        const poolAndThumbnail = searchAllPools.map((pool) => {
+            const { id, name, address, poolImages } = pool;
+
+            let thumbnail = undefined;
+            let isBookMarked = false;
+
+            // 해당 수영장에 대한 사진이 있다면, 첫 번째를 골라 제공하겠다.
+            if (poolImages.length !== 0) {
+                thumbnail = poolImages[0].image.url;
+            }
+            if(userBookmarkPoolIds.includes(id)){
+                isBookMarked = true;
+            }
+
+            return {
+                id: id,
+                name: name,
+                address: address,
+                thumbnail,
+                isBookMarked
+            }
+        });
+
+        if(totalNumber === 0) {
+            throw new HttpException({
+                status : "error",
+                message : "조건에 맞는 수영장을 찾지 못했습니다."
+            }, HttpStatus.NOT_FOUND)
+        }
+
+        return {
+            status: "success",
+            message: "조건식 수영장 목록 조회 성공",
+            data: {
+                total: totalNumber,
+                page,
+                limit,
+                pools : poolAndThumbnail
+            }
         }
     }
 
