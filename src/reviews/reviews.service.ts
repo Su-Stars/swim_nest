@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Keyword, Review_Keywords, Reviews } from './reviews.entity';
-import {  Repository } from 'typeorm';
+import {  In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GetQueryData } from 'src/pools/dto/get-query-data.dto';
 import { createReviews } from './dto/createReviews.dto';
@@ -30,7 +30,7 @@ export class ReviewsService {
     ) {
         const {limit, page} = query;
         
-        const test = await this.ReviewsRepository
+        const result = await this.ReviewsRepository
         .createQueryBuilder('Reviews')
         .leftJoin('Reviews.users', 'Users')
         .addSelect(['Users.nickname'])
@@ -47,10 +47,8 @@ export class ReviewsService {
                 total: await this.ReviewsRepository.count(),
                 page,
                 limit,
-                summary: {
-                }
             },
-            reviews: test
+            reviews: result
         }
     }
 
@@ -59,12 +57,18 @@ export class ReviewsService {
         body: createReviews,
         req: Request
     ) {
-        const {content} : createReviews = body;
+        const {content, keyword} : createReviews = body;
         const {id} : JwtPayload = req['user']
 
-        if (!await this.PoolsRepository.find({where: {id: poolId}})) {
+        if ((await this.PoolsRepository.find({where: {id: poolId}})).length === 0) {
             throw new NotFoundException();
         }
+
+        const keyword_id = await this.KeywordRepository.find({
+            where: {
+                keyword: In(keyword)
+            }
+        })
 
         const reviewsResult = {
             userId: id,
@@ -73,6 +77,13 @@ export class ReviewsService {
         }
 
         const {raw} = await this.ReviewsRepository.insert(reviewsResult)
+
+        await this.Review_Keywords.insert(
+            keyword_id.map((i) => ({
+                keyword_id: i.id,
+                review_id: raw.insertId
+            }))
+        )
 
         return {
             status: "success",

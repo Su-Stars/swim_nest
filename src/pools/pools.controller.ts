@@ -125,7 +125,7 @@ export class PoolsController {
     }
 
     // 리뷰 조회
-    @Get('/test/:poolId/reviews')
+    @Get('/:poolId/reviews')
     @HttpCode(200)
     async getAllPoolsReviews (
         @Param('poolId') poolId: number,
@@ -134,8 +134,8 @@ export class PoolsController {
         return await this.reviewsService.getAllPoolsReviews(poolId, query)
     }
 
-    // 리뷰 추가가
-    @Post('/test/:poolId/reviews')
+    // 리뷰 추가
+    @Post('/:poolId/reviews')
     @HttpCode(200)
     async addPoolsReviews (
         @Param('poolId') poolId: number,
