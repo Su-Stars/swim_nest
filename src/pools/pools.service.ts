@@ -7,7 +7,7 @@ import {
     NotFoundException
 } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
-import { poolImages, Pools } from './pools.entity';
+import { PoolImages, Pools } from './pools.entity';
 import { In, Repository } from 'typeorm';
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
@@ -24,8 +24,8 @@ export class PoolsService {
         @InjectRepository(Pools)
         private PoolsRepository: Repository<Pools>,
 
-        @InjectRepository(poolImages)
-        private poolImagesRepository: Repository<poolImages>,
+        @InjectRepository(PoolImages)
+        private poolImagesRepository: Repository<PoolImages>,
 
         private coordinateAPI: CoordinateApiService,
         private readonly bookmarksService : BookmarksService
@@ -35,29 +35,47 @@ export class PoolsService {
     async getAllPools(query: GetQueryData): Promise<any> {
         const {page, limit, region, keyword} = query;
 
-        
+
+
+
+        /*
+        // 아마 모든 수영장에 대한 조회가 들어왔을 때, 그에 대한 반환을 하려고 시도하신 듯.
         const pools = await this.PoolsRepository.find({
             select: ['id', 'name', 'address'],
             take: limit,
             skip: (page -1) * limit,
         })
 
+        //
         const poolImages = await this.poolImagesRepository.find({
-            where: { pool_id: In(pools.map(pools => pools.id)) }, 
-            relations: ['image'],  
+            where: { pool_id: In(pools.map(pools => pools.id)) },
+            relations: ['image'],
           });
 
         const uniqueArr = poolImages.filter((item, index, self) => {
             return  self.findIndex((el) => el.pool_id === item.pool_id) === index;
           })
 
-         
+         */
 
 
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
+            const searchAllPools  = await this.PoolsRepository.find({
+                select: ['id', 'name', 'address'],
+                take: limit,
+                skip: (page -1) * limit,
+                relations : {
+                    poolImages : {
+                        image : true
+                    }
+                }
+            });
+
+
+
             return {
-                stauts: "success",
+                status: "success",
                 message: "지역별 수영장 목록 조회 성공",
                 data: {
                     total: await this.PoolsRepository.count(),
@@ -233,7 +251,7 @@ export class PoolsService {
 
         await this.poolImagesRepository.createQueryBuilder()
         .insert()
-        .into(poolImages)
+        .into(PoolImages)
         .values({
             pool_id: id,
             image_id: identifiers[0].id
