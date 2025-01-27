@@ -119,5 +119,14 @@ export class PoolsController {
             return await this.poolsService.adminUploadImage(id, imageResult)
         }
     }
+
+    @Get('test/reviews')
+    @HttpCode(200)
+    async getAllPoolsReviews (
+        @Param('poolId') poolId: number,
+        @Query() query: GetQueryData
+    ) {
+        console.log(await this.getAllPoolsReviews(poolId, query))
+    }
 }
 

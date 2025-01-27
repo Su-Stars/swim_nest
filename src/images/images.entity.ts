@@ -27,6 +27,6 @@ export class Images {
     @CreateDateColumn()
     uploaded_at: Date;
 
-    @OneToMany(() => poolImages, (poolimages) => poolimages.image)
-    imagesId: Images
+    @OneToMany(() => poolImages, (poolimages) => poolimages.poolimages_image_id)
+    poolimages: poolImages[];
 }

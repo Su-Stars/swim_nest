@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { Images } from "src/images/images.entity";
+import { Reviews } from "src/reviews/reviews.entity";
 
 @Entity()
 @Index("FT_search", ['name', 'address'], {fulltext: true})
@@ -82,8 +83,11 @@ export class Pools{
     @OneToMany(() => Bookmarks, (bookmark) => bookmark.pools)
     bookmarks : Bookmarks[];
 
-    @OneToMany(() => poolImages, (poolimages) => poolimages.poolid)
-    pools: Pools[];
+    @OneToMany(() => poolImages, (poolimages) => poolimages.poolimages_pool_id)
+    poolimages: poolImages[];
+
+    @OneToMany(() => Reviews, (reviews) => reviews.reviews_pool_id)
+    reviews: Reviews[];
 }
 
 
@@ -92,24 +96,24 @@ export class poolImages {
     @PrimaryGeneratedColumn()
     id: number
 
-    @ManyToOne(() => Pools, (pools) => pools.pools, {
+    @ManyToOne(() => Pools, (pools) => pools.poolimages, {
         onDelete : "CASCADE"
     })
     @JoinColumn({
         name: 'pool_id'
     })
-    poolid: poolImages
+    poolimages_pool_id: Pools
 
     @Column()
     pool_id: number
 
-    @ManyToOne(() => Images, (images) => images.imagesId, {
+    @ManyToOne(() => Images, (images) => images.poolimages, {
         onDelete : "CASCADE"
     })
     @JoinColumn({
         name: "image_id"
     })
-    image: poolImages
+    poolimages_image_id: Images
 
     @Column()
     image_id: number

@@ -16,6 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ImagesModule } from 'src/images/images.module';
 import { ImagesService } from 'src/images/images.service';
 import { BookmarksModule } from '../bookmarks/bookmarks.module';
+import { ReviewsModule } from "src/reviews/reviews.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
     AuthModule,
     ImagesModule,
     AuthModule,
+    ReviewsModule,
     forwardRef(() => BookmarksModule),
   ],
   controllers: [PoolsController],
