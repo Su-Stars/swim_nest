@@ -9,7 +9,7 @@ import {
     Param,
     ParseIntPipe,
     Patch,
-    Post,
+    Post, Put,
     Query,
     Req,
     SerializeOptions,
@@ -28,6 +28,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { BookmarksService } from "../bookmarks/bookmarks.service";
+import { ImageUrls } from "./dto/image-urls.dto";
 
 
 @Controller('api/v1/pools')
@@ -156,6 +157,13 @@ export class PoolsController {
             const imageResult: any = await this.imagesService.uploadImages(req, file, id)
             return await this.poolsService.adminUploadImage(id, imageResult)
         }
+    }
+
+    // 관리자 수영장 이미지 URL 수동 추가 - 로컬에서 이미지 URL 올리기 위한 임시 메서드
+    @Put("images/:pool_id")
+    @HttpCode(HttpStatus.ACCEPTED) // 202
+    async uploadImageUrl(@Param("pool_id", ParseIntPipe) pool_id : number, @Body() imageUrls : ImageUrls) {
+
     }
 }
 
