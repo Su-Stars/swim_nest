@@ -18,6 +18,8 @@ import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service'
 import { updatePool } from './dto/updatePool.dto';
 import { AuthService } from "../auth/auth.service";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
+import { Images } from "../images/images.entity";
+import { ImagesService } from "../images/images.service";
 
 
 @Injectable()
@@ -33,6 +35,8 @@ export class PoolsService {
         private readonly bookmarksService : BookmarksService,
 
         private readonly authService : AuthService,
+
+        private readonly imageService : ImagesService
     ) {}
 
     async addToMyBookmark(user_id : number, pool_id : number) {
@@ -86,7 +90,7 @@ export class PoolsService {
         await this.bookmarksService.deleteMyBookmarks(user_id, bookmark.bookId)
     }
 
-    // Pool 전체 조회
+    // Pool 전체 조회 - 비인가 유저 혹은 인가 유저 사용 메서드
     async getAllPools(query: GetQueryData, req : Request): Promise<any> {
         let {page, limit, region, keyword} = query;
 
@@ -123,7 +127,7 @@ export class PoolsService {
             });
 
             const poolAndThumbnail = searchAllPools.map((pool) => {
-                const {id, name, address, poolImages} = pool;
+                const {id, name, address, longtitude, latitude, poolImages} = pool;
 
                 let thumbnail = undefined;
                 let isBookMarked = false;
@@ -140,6 +144,8 @@ export class PoolsService {
                     id : id,
                     name : name,
                     address : address,
+                    longitude : longtitude,
+                    latitude : latitude,
                     thumbnail,
                     isBookMarked
                 }
@@ -247,40 +253,32 @@ export class PoolsService {
     }
 
     // Pool id 조회
-    async getByIdPool(poolId: number): Promise<any> {
-        const result = await this.PoolsRepository.createQueryBuilder('pool')
-            .select(['pool.id',
-                    'pool.name',
-                    'pool.address',
-                    'pool.phone',
-                    'pool.website',
-                    'pool.latitude',
-                    'pool.longtitude',
-                    'pool.freeSwimLink',
-                    'pool.swimLessonLink',
-                    'pool.laneInfo',
-                    'pool.depthInfo',
-                    'pool.isSoapProvided',
-                    'pool.isTowelProvided',
-                    'pool.isKickboardAllowed',
-                    'pool.isFinsAllowed',
-                    'pool.isKickboardRental',
-                    'pool.isDivingAllowed',
-                    'pool.isPhotoAllowed'
-                    ])
-            .where('pool.id = :id', { id: poolId})
-            .getMany();
-            
-            if (result.length === 0) {
-                throw new NotFoundException();
-            }
+    async getByIdPool(poolId: number) {
+        
+        const pool = await this.PoolsRepository.findOneBy({
+            id : poolId
+        });
 
-            // 이미지는 추후 추가
-            return {
-                stauts: "success",
-                message: "수영장 정보 조회 성공",
-                data: result
-            }
+        if (!pool) {
+          throw new HttpException({
+              status : "error",
+              message : "존재하지 않는 수영장 id 를 검색하셨습니다."
+          }, HttpStatus.NOT_FOUND);
+        }
+
+        const data = {
+            ...pool,
+            longitude : pool.longtitude
+        }
+
+        delete data.longtitude;
+
+        // 이미지는 추후 추가
+        return {
+          status: 'success',
+          message: '수영장 정보 조회 성공',
+          data: data,
+        };
     }
 
     // 관리자 Pool 추가
@@ -405,6 +403,15 @@ export class PoolsService {
     }
 
     async uploadPoolImageUrl(pool_id : number, image_urls : string[]) {
+        const imageEntities : Images[] = await this.imageService.adminSaveImageUrl(image_urls);
 
+        const poolImageEntities : PoolImages[] = imageEntities.map((imageEntity) => ({
+            pool_id : pool_id,
+            image_id : imageEntity.id
+        }) as PoolImages);
+
+        const result = await this.poolImagesRepository.save(poolImageEntities);
+
+        return result;
     }
 }
