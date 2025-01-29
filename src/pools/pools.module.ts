@@ -3,8 +3,8 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
-  RequestMethod
-} from "@nestjs/common";
+  RequestMethod,
+} from '@nestjs/common';
 import { PoolsController } from './pools.controller';
 import { PoolsService } from './pools.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -27,8 +27,8 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
     forwardRef(() => BookmarksModule),
   ],
   controllers: [PoolsController],
-  providers: [PoolsService, CoordinateApiService,ImagesService],
-  exports: [PoolsService, CoordinateApiService, TypeOrmModule, ]
+  providers: [PoolsService, CoordinateApiService, ImagesService],
+  exports: [PoolsService, CoordinateApiService, TypeOrmModule],
 })
 export class PoolsModule implements NestModule {
   async configure(consumer: MiddlewareConsumer) {
@@ -42,6 +42,10 @@ export class PoolsModule implements NestModule {
         {
           path: 'api/v1/pools/:poolId',
           method: RequestMethod.GET,
+        },
+        {
+          path: 'api/v1/pools/images/:poolId',
+          method: RequestMethod.PUT,
         },
       )
       .forRoutes(PoolsController);
