@@ -7,5 +7,5 @@ export class createReviews {
 
     @IsOptional()
     @IsArray()
-    keyword: string[];
+    keyword: string[] = [];
 }

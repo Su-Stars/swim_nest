@@ -45,6 +45,10 @@ export class PoolsModule implements NestModule {
           path: 'api/v1/pools/:poolId',
           method: RequestMethod.GET,
         },
+        {
+          path: 'api/v1/pools/:poolId/reviews',
+          method: RequestMethod.GET
+        }
       )
       .forRoutes(PoolsController);
   }

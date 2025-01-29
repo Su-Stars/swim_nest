@@ -29,6 +29,7 @@ import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { createReviews } from "src/reviews/dto/createReviews.dto";
 import { ReviewsService } from "src/reviews/reviews.service";
+import { updateReviews } from "src/reviews/dto/updateReviews.dto";
 
 
 @Controller('api/v1/pools')
@@ -143,6 +144,29 @@ export class PoolsController {
         @Req() req: Request
     ) {
         return await this.reviewsService.addPoolsReviews(poolId, body, req)
+    }
+
+    // 리뷰 수정
+    @Patch('/:poolId/reviews/:reviewId')
+    @HttpCode(200)
+    async updatePoolsReviews (
+        @Param('poolId') poolId: number,
+        @Param('reviewId') reviewId: number,
+        @Body() body: updateReviews,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.userUpdatepoolsReviews(poolId, reviewId, body, req)
+    }
+
+    // 리뷰 삭제
+    @Delete('/:poolId/reviews/:reviewId')
+    @HttpCode(200)
+    async deletePoolsReviews (
+        @Param('poolId') poolId: number,
+        @Param('reviewId') reviewId: number,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.deletePoolsReviews(poolId, reviewId, req)
     }
 }
 

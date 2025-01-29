@@ -1,6 +1,15 @@
 import { Pools } from "src/pools/pools.entity";
 import { Users } from "src/users/users.entity";
-import { BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+     BeforeUpdate,
+     Column,
+     CreateDateColumn,
+     Entity, 
+     JoinColumn, 
+     ManyToOne, 
+     OneToMany, 
+     PrimaryGeneratedColumn, 
+     } from "typeorm";
 
 @Entity()
 export class Reviews {
@@ -35,13 +44,8 @@ export class Reviews {
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
 
-    @Column({ type: "timestamp", nullable: true, default: null })
+    @Column({ type: "timestamp", nullable: true})
     updatedAt: Date | null;
-
-    @BeforeUpdate()
-    updateTimestamp() {
-        this.updatedAt = new Date();
-    }
 
     @OneToMany(() => Review_Keywords, (review_keywords) => review_keywords.reviews)
     review_keywords: Review_Keywords[];
