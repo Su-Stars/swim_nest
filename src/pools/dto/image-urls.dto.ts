@@ -5,5 +5,5 @@ export class ImageUrls {
   @ApiProperty()
   @IsArray()
   @IsNotEmpty()
-  imageUrls : string[]
+  imageUrls : string[] = [];
 }

@@ -4,7 +4,7 @@ import {
     Controller,
     Delete,
     Get,
-    HttpCode,
+    HttpCode, HttpException,
     HttpStatus,
     Param,
     ParseIntPipe,
@@ -162,8 +162,23 @@ export class PoolsController {
     // 관리자 수영장 이미지 URL 수동 추가 - 로컬에서 이미지 URL 올리기 위한 임시 메서드
     @Put("images/:pool_id")
     @HttpCode(HttpStatus.ACCEPTED) // 202
-    async uploadImageUrl(@Param("pool_id", ParseIntPipe) pool_id : number, @Body() imageUrls : ImageUrls) {
+    async uploadImageUrl(@Param("pool_id", ParseIntPipe) pool_id : number, @Body() urlBody : ImageUrls) {
+        // url 이 없다면, 빈 배열로 들어온다.
+        const {imageUrls} = urlBody;
 
+        if(imageUrls.length === 0) {
+            throw new HttpException({
+                status : "fail",
+                message : "어떠한 url 도 들어오지 않았습니다."
+            }, HttpStatus.BAD_REQUEST);
+        }
+
+        await this.poolsService.uploadPoolImageUrl(pool_id, imageUrls);
+
+        return {
+            status : "success",
+            message : "이미지 url 업로드에 성공했습니다."
+        }
     }
 }
 

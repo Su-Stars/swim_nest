@@ -403,7 +403,8 @@ export class PoolsService {
             data: replace
         }
     }
-    async uploadImageUrl(pool_id : number, image_urls : string[]) {
+
+    async uploadPoolImageUrl(pool_id : number, image_urls : string[]) {
 
     }
 }

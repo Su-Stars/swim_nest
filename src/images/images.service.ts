@@ -75,6 +75,8 @@ export class ImagesService {
         }
     }
 
-    
+    async adminInsertImageUrl(url : string) {
+
+    }
 }
 
