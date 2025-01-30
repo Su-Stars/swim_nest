@@ -116,7 +116,7 @@ export class PoolsService {
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
             const searchAllPools  = await this.PoolsRepository.find({
-                select: ['id', 'name', 'address'],
+                select: ['id', 'name', 'address', 'longitude', 'latitude'],
                 take: limit,
                 skip: (page -1) * limit,
                 relations : {
@@ -127,7 +127,7 @@ export class PoolsService {
             });
 
             const poolAndThumbnail = searchAllPools.map((pool) => {
-                const {id, name, address, longtitude, latitude, poolImages} = pool;
+                const {id, name, address, longitude, latitude, poolImages} = pool;
 
                 let thumbnail = undefined;
                 let isBookMarked = false;
@@ -140,12 +140,13 @@ export class PoolsService {
                     isBookMarked = true;
                 }
 
+
                 return {
                     id : id,
                     name : name,
                     address : address,
-                    longitude : longtitude,
-                    latitude : latitude,
+                    longitude : parseFloat(longitude),
+                    latitude : parseFloat(latitude),
                     thumbnail,
                     isBookMarked
                 }
@@ -199,7 +200,7 @@ export class PoolsService {
         }
 
         const [searchAllPools, totalNumber]  = await this.PoolsRepository.findAndCount({
-            select: ['id', 'name', 'address'],
+            select: ['id', 'name', 'address', 'longitude', 'latitude'],
             take: limit,
             skip: (page -1) * limit,
             relations : {
@@ -211,7 +212,7 @@ export class PoolsService {
         });
 
         const poolAndThumbnail = searchAllPools.map((pool) => {
-            const { id, name, address, poolImages } = pool;
+            const { id, name, address, longitude, latitude, poolImages } = pool;
 
             let thumbnail = undefined;
             let isBookMarked = false;
@@ -228,6 +229,8 @@ export class PoolsService {
                 id: id,
                 name: name,
                 address: address,
+                longitude : parseFloat(longitude),
+                latitude : parseFloat(latitude),
                 thumbnail,
                 isBookMarked
             }
@@ -255,9 +258,18 @@ export class PoolsService {
     // Pool id 조회
     async getByIdPool(poolId: number) {
         
-        const pool = await this.PoolsRepository.findOneBy({
-            id : poolId
-        });
+        const pool = await this.PoolsRepository.findOne(
+          {
+              where : {
+                  id : poolId
+              },
+              relations : {
+                  poolImages : {
+                      image : true
+                  }
+              }
+          }
+        )
 
         if (!pool) {
           throw new HttpException({
@@ -268,10 +280,14 @@ export class PoolsService {
 
         const data = {
             ...pool,
-            longitude : pool.longtitude
+            longitude : parseFloat(pool.longitude),
+            latitude : parseFloat(pool.latitude),
+            images : pool.poolImages.map((poolImage) => {
+                return poolImage.image.url
+            })
         }
 
-        delete data.longtitude;
+        delete data.poolImages;
 
         // 이미지는 추후 추가
         return {
@@ -285,14 +301,14 @@ export class PoolsService {
     async adminCreatePool(req: Request, body: createPool) {
         const {role} : JwtPayload = req["user"]
         const {address} : createPool = body
-        const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+        const { longitude, latitude } = await this.coordinateAPI.fechData(address)
 
         if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
         } else if (role === 'admin') {
-            const { identifiers } = await this.PoolsRepository.insert({...body, longtitude, latitude});
+            const { identifiers } = await this.PoolsRepository.insert({...body, longitude : longitude, latitude});
 
             return {
                 status: "success",
@@ -320,9 +336,9 @@ export class PoolsService {
 
         if (body.address) {
             const {address} : updatePool = body;
-            const { longtitude, latitude } = await this.coordinateAPI.fechData(address);
+            const { longitude, latitude } = await this.coordinateAPI.fechData(address);
 
-            await this.PoolsRepository.update({id: poolId}, {...body, longtitude, latitude})
+            await this.PoolsRepository.update({id: poolId}, {...body, longitude : longitude, latitude})
             return {
                 status: "success",
                 message: "수영장 정보가 수정되었습니다."
