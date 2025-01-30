@@ -72,9 +72,11 @@ export class Users {
   @OneToMany(() => SwimLogs, (swimLog) => swimLog.users )
   swimLogs : SwimLogs[];
 
-  @OneToMany(() => Follows, (follow) => follow.users)
-  follows : Follows[];
+  // 내가 팔로우한 사람들 (Following)
+  @OneToMany(() => Follows, (follows) => follows.user)
+  following: Follows[];
 
-  @OneToMany(() => Reviews, (reviews) => reviews.users )
-  reviews : Reviews[];
+  // 나를 팔로우한 사람들 (Followers)
+  @OneToMany(() => Follows, (follows) => follows.follow_user)
+  followers: Follows[];
 }

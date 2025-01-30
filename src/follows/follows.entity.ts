@@ -6,20 +6,17 @@ export class Follows {
   @PrimaryGeneratedColumn()
   id : number;
 
-  @ManyToOne(() => Users, (users) => users.follows)
-  @JoinColumn({
-    name : "user_id"
-  })
-  users : Users
+  @ManyToOne(() => Users, (user) => user.following)
+  @JoinColumn({ name: "user_id" })
+  user: Users;
 
   @Column()
-  user_id : number;
+  user_id: number;
 
-  @ManyToOne(() => Users, (users) => users.follows)
-  @JoinColumn({
-    name : "follow_id"
-  })
-  follow_user_id : number;
+  // ✅ 팔로우 당하는 사람 (팔로우 대상)
+  @ManyToOne(() => Users, (user) => user.followers)
+  @JoinColumn({ name: "follow_id" })
+  follow_user: Users;
 
   @Column()
   follow_id : number;
