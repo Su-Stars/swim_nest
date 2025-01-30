@@ -29,6 +29,9 @@ import { ImagesModule } from './images/images.module';
       entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages],
       synchronize: true,
       charset : "utf8mb4",
+      cache : {
+        duration : 0
+      }
     }),
     AppModule,
     UsersModule,
