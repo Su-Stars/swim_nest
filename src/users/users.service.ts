@@ -23,8 +23,8 @@ export class UsersService {
           review_keywords : {
             keyword : true
           }
-        }
-      }
+        },
+      },
     });
 
 
