@@ -18,6 +18,8 @@ import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service'
 import { updatePool } from './dto/updatePool.dto';
 import { AuthService } from "../auth/auth.service";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
+import { Images } from "../images/images.entity";
+import { ImagesService } from "../images/images.service";
 
 
 @Injectable()
@@ -33,9 +35,62 @@ export class PoolsService {
         private readonly bookmarksService : BookmarksService,
 
         private readonly authService : AuthService,
+
+        private readonly imageService : ImagesService
     ) {}
 
-    // Pool 전체 조회
+    async addToMyBookmark(user_id : number, pool_id : number) {
+        const isExistPools = await this.PoolsRepository.exists({
+            where : {
+                id : pool_id
+            }
+        })
+
+        // invalid 한 수영장 번호 입력 시 404 반환
+        if(!isExistPools) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.NOT_FOUND)
+        }
+
+        // 북마크가 있다면, 반환되며, 이미 북마크 하였다면, 409 예외를 반환
+        const bookmark = await this.bookmarksService.newBookmarks(user_id, pool_id);
+
+        return bookmark;
+    }
+
+    async deleteMyBookmark(user_id : number, pool_id : number) {
+        // 존재하는 수영장인지 확인
+        const isExistPool = await this.PoolsRepository.exists({
+            where : {
+                id : pool_id
+            }
+        });
+
+        // 없는 수영자이면 404 반환
+        if(!isExistPool) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장 번호를 입력하셨습니다."
+            }, HttpStatus.NOT_FOUND)
+        }
+
+        // 북마크가 되어 있는 건지 확인
+        const bookmark = await this.bookmarksService.isBookmarked(user_id, pool_id);
+
+        // 이미 북마크 해제했거나, 아예 북마크를 한 적이 없다면, 406 반환
+        if(!bookmark.isBookMarked){
+            throw new HttpException({
+                status : "error",
+                message : "없는 북마크를 삭제 할 수 없습니다."
+            }, HttpStatus.NOT_ACCEPTABLE)
+        }
+
+        await this.bookmarksService.deleteMyBookmarks(user_id, bookmark.bookId)
+    }
+
+    // Pool 전체 조회 - 비인가 유저 혹은 인가 유저 사용 메서드
     async getAllPools(query: GetQueryData, req : Request): Promise<any> {
         let {page, limit, region, keyword} = query;
 
@@ -61,7 +116,7 @@ export class PoolsService {
         // 전체 조회
         if (region === 'all' && keyword === 'all') {
             const searchAllPools  = await this.PoolsRepository.find({
-                select: ['id', 'name', 'address'],
+                select: ['id', 'name', 'address', 'longitude', 'latitude'],
                 take: limit,
                 skip: (page -1) * limit,
                 relations : {
@@ -72,7 +127,7 @@ export class PoolsService {
             });
 
             const poolAndThumbnail = searchAllPools.map((pool) => {
-                const {id, name, address, poolImages} = pool;
+                const {id, name, address, longitude, latitude, poolImages} = pool;
 
                 let thumbnail = undefined;
                 let isBookMarked = false;
@@ -85,10 +140,13 @@ export class PoolsService {
                     isBookMarked = true;
                 }
 
+
                 return {
                     id : id,
                     name : name,
                     address : address,
+                    longitude : parseFloat(longitude),
+                    latitude : parseFloat(latitude),
                     thumbnail,
                     isBookMarked
                 }
@@ -142,7 +200,7 @@ export class PoolsService {
         }
 
         const [searchAllPools, totalNumber]  = await this.PoolsRepository.findAndCount({
-            select: ['id', 'name', 'address'],
+            select: ['id', 'name', 'address', 'longitude', 'latitude'],
             take: limit,
             skip: (page -1) * limit,
             relations : {
@@ -154,7 +212,7 @@ export class PoolsService {
         });
 
         const poolAndThumbnail = searchAllPools.map((pool) => {
-            const { id, name, address, poolImages } = pool;
+            const { id, name, address, longitude, latitude, poolImages } = pool;
 
             let thumbnail = undefined;
             let isBookMarked = false;
@@ -171,6 +229,8 @@ export class PoolsService {
                 id: id,
                 name: name,
                 address: address,
+                longitude : parseFloat(longitude),
+                latitude : parseFloat(latitude),
                 thumbnail,
                 isBookMarked
             }
@@ -196,54 +256,59 @@ export class PoolsService {
     }
 
     // Pool id 조회
-    async getByIdPool(poolId: number): Promise<any> {
-        const result = await this.PoolsRepository.createQueryBuilder('pool')
-            .select(['pool.id',
-                    'pool.name',
-                    'pool.address',
-                    'pool.phone',
-                    'pool.website',
-                    'pool.latitude',
-                    'pool.longtitude',
-                    'pool.freeSwimLink',
-                    'pool.swimLessonLink',
-                    'pool.laneInfo',
-                    'pool.depthInfo',
-                    'pool.isSoapProvided',
-                    'pool.isTowelProvided',
-                    'pool.isKickboardAllowed',
-                    'pool.isFinsAllowed',
-                    'pool.isKickboardRental',
-                    'pool.isDivingAllowed',
-                    'pool.isPhotoAllowed'
-                    ])
-            .where('pool.id = :id', { id: poolId})
-            .getMany();
-            
-            if (result.length === 0) {
-                throw new NotFoundException();
-            }
+    async getByIdPool(poolId: number) {
+        
+        const pool = await this.PoolsRepository.findOne(
+          {
+              where : {
+                  id : poolId
+              },
+              relations : {
+                  poolImages : {
+                      image : true
+                  }
+              }
+          }
+        )
 
-            // 이미지는 추후 추가
-            return {
-                stauts: "success",
-                message: "수영장 정보 조회 성공",
-                data: result
-            }
+        if (!pool) {
+          throw new HttpException({
+              status : "error",
+              message : "존재하지 않는 수영장 id 를 검색하셨습니다."
+          }, HttpStatus.NOT_FOUND);
+        }
+
+        const data = {
+            ...pool,
+            longitude : parseFloat(pool.longitude),
+            latitude : parseFloat(pool.latitude),
+            images : pool.poolImages.map((poolImage) => {
+                return poolImage.image.url
+            })
+        }
+
+        delete data.poolImages;
+
+        // 이미지는 추후 추가
+        return {
+          status: 'success',
+          message: '수영장 정보 조회 성공',
+          data: data,
+        };
     }
 
     // 관리자 Pool 추가
     async adminCreatePool(req: Request, body: createPool) {
         const {role} : JwtPayload = req["user"]
         const {address} : createPool = body
-        const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+        const { longitude, latitude } = await this.coordinateAPI.fechData(address)
 
         if (role === 'user') {
             throw new ForbiddenException({
                 message: "권한이 존재하지 않습니다."
             })
         } else if (role === 'admin') {
-            const { identifiers } = await this.PoolsRepository.insert({...body, longtitude, latitude});
+            const { identifiers } = await this.PoolsRepository.insert({...body, longitude : longitude, latitude});
 
             return {
                 status: "success",
@@ -270,10 +335,10 @@ export class PoolsService {
 
 
         if (body.address) {
-            const {address} : updatePool = body
-            const { longtitude, latitude } = await this.coordinateAPI.fechData(address)
+            const {address} : updatePool = body;
+            const { longitude, latitude } = await this.coordinateAPI.fechData(address);
 
-            await this.PoolsRepository.update({id: poolId}, {...body, longtitude, latitude})
+            await this.PoolsRepository.update({id: poolId}, {...body, longitude : longitude, latitude})
             return {
                 status: "success",
                 message: "수영장 정보가 수정되었습니다."
@@ -318,7 +383,7 @@ export class PoolsService {
             throw new HttpException({
                 status : "error",
                 message : "존재하지 않는 수영장 번호를 입력하셨습니다."
-            }, HttpStatus.BAD_REQUEST)
+            }, HttpStatus.NOT_FOUND)
         }
 
         const isBookmarked = await this.bookmarksService.isBookmarked(user_id, pool_id);
@@ -351,5 +416,18 @@ export class PoolsService {
             message: "이미지 업로드에 성공했습니다.",
             data: replace
         }
+    }
+
+    async uploadPoolImageUrl(pool_id : number, image_urls : string[]) {
+        const imageEntities : Images[] = await this.imageService.adminSaveImageUrl(image_urls);
+
+        const poolImageEntities : PoolImages[] = imageEntities.map((imageEntity) => ({
+            pool_id : pool_id,
+            image_id : imageEntity.id
+        }) as PoolImages);
+
+        const result = await this.poolImagesRepository.save(poolImageEntities);
+
+        return result;
     }
 }

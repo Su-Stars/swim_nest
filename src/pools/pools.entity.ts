@@ -32,10 +32,10 @@ export class Pools{
     website: string;
 
     @Column("decimal", {precision: 10, scale: 8, nullable: true})
-    latitude: number;
+    latitude: string;
 
     @Column("decimal", {precision: 11, scale: 8, nullable: true})
-    longtitude: number;
+    longitude: string;
 
     @Column({nullable: true, name: "free_swim_link"})
     freeSwimLink: string;

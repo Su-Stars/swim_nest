@@ -31,6 +31,9 @@ import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
       entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords],
       synchronize: true,
       charset : "utf8mb4",
+      cache : {
+        duration : 0
+      }
     }),
     AppModule,
     UsersModule,
