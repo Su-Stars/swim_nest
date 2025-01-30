@@ -8,6 +8,7 @@ import { JwtPayload } from 'src/auth/dto/jwt-payload';
 import { Request } from 'express';
 import { Pools } from 'src/pools/pools.entity';
 import { updateReviews } from './dto/updateReviews.dto';
+import { GetReviewQueryDto } from "./dto/getReviewQuery.dto";
 
 @Injectable()
 export class ReviewsService {
@@ -55,8 +56,8 @@ export class ReviewsService {
                 }),
                 page,
                 limit,
+                reviews: result
             },
-            reviews: result
         }
     }
 
@@ -264,5 +265,39 @@ export class ReviewsService {
             status : "success",
             message : "리뷰가 삭제되었습니다."
         }
+    }
+
+    async adminGetReviews(query : GetReviewQueryDto) {
+        const {page, limit} = query;
+
+        const [reviews, count] = await this.ReviewsRepository.findAndCount({
+            skip : (page - 1) * limit,
+            take : limit,
+            order : {
+                createdAt : "DESC"
+            },
+            relations : {
+                review_keywords : {
+                    keyword : true
+                }
+            }
+        })
+
+
+        return {
+          status: 'success',
+          message: '전체 리뷰 목록 조회 성공',
+          data: {
+            total: count,
+            page: page,
+            limit: limit,
+            reviews: reviews.map((review) => ({
+              ...review,
+              review_keywords: review.review_keywords.map((keyword) => {
+                return keyword.keyword.keyword;
+              }),
+            })),
+          },
+        };
     }
 }

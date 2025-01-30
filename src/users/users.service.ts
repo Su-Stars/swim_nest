@@ -5,12 +5,49 @@ import { Users } from "./users.entity";
 import { Repository } from "typeorm";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { EditUserInfoDto } from "./dto/editUserInfo.dto";
+import { MyReviewQueryDto } from "./dto/myReviewQuery.dto";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users) private usersRepository : Repository<Users>,
   ) {}
+
+  async getMyReviews(user_id : number, query : MyReviewQueryDto) {
+    const userAndReviews = await this.usersRepository.findOne({
+      where : {
+        id : user_id
+      },
+      relations : {
+        reviews : {
+          review_keywords : {
+            keyword : true
+          }
+        },
+      },
+    });
+
+
+
+    const exceptUserCriticalInfo = {
+      userId : userAndReviews.id,
+      total : userAndReviews.reviews.length,
+      page : query.page,
+      limit : query.limit,
+      reviews : userAndReviews.reviews.map((review) => ({
+        ...review,
+        review_keywords : review.review_keywords.map((keyword) => {
+          return keyword.keyword.keyword; // 어지럽다 ㅋㅋㅋㅋㅋ
+        })
+      }))
+    }
+
+    return {
+      status : "success",
+      message : userAndReviews.reviews.length === 0 ? "사용자가 작성한 리뷰가 없습니다." : "내 리뷰 목록 조회 성공",
+      data : exceptUserCriticalInfo
+    }
+  }
 
   async getMyInfo(jwtPayload : JwtPayload) {
     const {id, role} : JwtPayload = jwtPayload;
