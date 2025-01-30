@@ -24,7 +24,7 @@ export class Reviews {
     })
     pools: Pools;
 
-    @Column({name: "pool_id"})
+    @Column()
     poolId: number;
 
     @ManyToOne(() => Users, (users) => users.reviews, {
