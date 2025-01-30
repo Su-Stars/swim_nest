@@ -29,6 +29,9 @@ import { ImagesService } from 'src/images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { ImageUrls } from "./dto/image-urls.dto";
+import { createReviews } from "src/reviews/dto/createReviews.dto";
+import { ReviewsService } from "src/reviews/reviews.service";
+import { updateReviews } from "src/reviews/dto/updateReviews.dto";
 
 
 @Controller('api/v1/pools')
@@ -36,6 +39,7 @@ export class PoolsController {
     constructor(
         private poolsService: PoolsService,
         private imagesService: ImagesService,
+        private reviewsService: ReviewsService
     ) {}
 
     // poolId 를 파라미터로 받고, 유저의 파라미터에 추가
@@ -71,7 +75,7 @@ export class PoolsController {
             message : "수영장이 내 수영장 목록에 제거되었습니다."
         }
     }
-    
+
     // 수영장 정보 조회
     @Get()
     @HttpCode(200)
@@ -115,7 +119,7 @@ export class PoolsController {
     // 로그인이 되어 있는 상태에서, 해당 수영장이 내가 북마크 한 수영장인지 확인하여 반환한다.
     @Get(":pool_id/bookmark")
     @HttpCode(HttpStatus.OK)
-    async isBookmarked(@Param("pool_id", ParseIntPipe) poolId : number, @Req() req : Request) {
+    async isBookmarked(@Param("poolId", ParseIntPipe) poolId : number, @Req() req : Request) {
         const jwtPayload : JwtPayload = req["user"];
 
         const {id} = jwtPayload;
@@ -157,6 +161,50 @@ export class PoolsController {
             const imageResult: any = await this.imagesService.uploadImages(req, file, id)
             return await this.poolsService.adminUploadImage(id, imageResult)
         }
+    }
+
+    // 리뷰 조회
+    @Get('reviews/:poolId')
+    @HttpCode(200)
+    async getAllPoolsReviews (
+        @Param('poolId') poolId: number,
+        @Query() query: GetQueryData
+    ) {
+        return await this.reviewsService.getAllPoolsReviews(poolId, query)
+    }
+
+    // 리뷰 추가
+    @Post('reviews/:poolId')
+    @HttpCode(200)
+    async addPoolsReviews (
+        @Param('poolId') poolId: number,
+        @Body() body: createReviews,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.addPoolsReviews(poolId, body, req)
+    }
+
+    // 리뷰 수정
+    @Patch('reviews/:poolId/:reviewId')
+    @HttpCode(200)
+    async updatePoolsReviews (
+        @Param('poolId') poolId: number,
+        @Param('reviewId') reviewId: number,
+        @Body() body: updateReviews,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.userUpdatepoolsReviews(poolId, reviewId, body, req)
+    }
+
+    // 리뷰 삭제
+    @Delete('reviews/:poolId/:reviewId')
+    @HttpCode(200)
+    async deletePoolsReviews (
+        @Param('poolId') poolId: number,
+        @Param('reviewId') reviewId: number,
+        @Req() req: Request
+    ) {
+        return await this.reviewsService.deletePoolsReviews(poolId, reviewId, req)
     }
 
     // 관리자 수영장 이미지 URL 수동 추가 - 로컬에서 이미지 URL 올리기 위한 임시 메서드

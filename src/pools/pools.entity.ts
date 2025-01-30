@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { Images } from "src/images/images.entity";
+import { Reviews } from "src/reviews/reviews.entity";
 
 @Entity()
 @Index("FT_search", ['name', 'address'], {fulltext: true})
@@ -84,6 +85,9 @@ export class Pools{
 
     @OneToMany(() => PoolImages, (poolImages) => poolImages.pools)
     poolImages: PoolImages[];
+
+    @OneToMany(() => Reviews, (reviews) => reviews.pools)
+    reviews: Reviews[];
 }
 
 

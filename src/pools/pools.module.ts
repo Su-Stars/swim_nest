@@ -16,6 +16,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ImagesModule } from 'src/images/images.module';
 import { ImagesService } from 'src/images/images.service';
 import { BookmarksModule } from '../bookmarks/bookmarks.module';
+import { ReviewsModule } from "src/reviews/reviews.module";
+import { ReviewsService } from "src/reviews/reviews.service";
 
 @Module({
   imports: [
@@ -23,11 +25,11 @@ import { BookmarksModule } from '../bookmarks/bookmarks.module';
     HttpModule,
     AuthModule,
     ImagesModule,
-    AuthModule,
+    ReviewsModule,
     forwardRef(() => BookmarksModule),
   ],
   controllers: [PoolsController],
-  providers: [PoolsService, CoordinateApiService, ImagesService],
+  providers: [PoolsService, CoordinateApiService,ImagesService, ReviewsService],
   exports: [PoolsService, CoordinateApiService, TypeOrmModule],
 })
 export class PoolsModule implements NestModule {
@@ -47,6 +49,10 @@ export class PoolsModule implements NestModule {
           path: 'api/v1/pools/images/:poolId',
           method: RequestMethod.PUT,
         },
+        {
+          path: 'api/v1/pools/:poolId/reviews',
+          method: RequestMethod.GET
+        }
       )
       .forRoutes(PoolsController);
   }
