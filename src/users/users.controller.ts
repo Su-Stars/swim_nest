@@ -1,14 +1,25 @@
-import { Body, Controller, Delete, Get, Patch, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch, Query, Req, Res } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Request, Response } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { EditUserInfoDto } from "./dto/editUserInfo.dto";
 import { ApiBody, ApiCookieAuth } from "@nestjs/swagger";
 import { AuthService } from "../auth/auth.service";
+import { MyReviewQueryDto } from "./dto/myReviewQuery.dto";
 
 @Controller('api/v1/users')
 export class UsersController {
   constructor(private readonly usersService : UsersService, private readonly authService : AuthService) {}
+
+  @Get("me/reviews")
+  @ApiCookieAuth()
+  async getMyReviews(@Req() req : Request, @Query() query : MyReviewQueryDto) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    return await this.usersService.getMyReviews(id, query);
+  }
 
   // 본인의 계정 삭제 - express res 객체를 사용하면, 반환할 때 무조건 res.json or end 로 끝내야함.(Nest 국룰임)
   @Delete("me")
