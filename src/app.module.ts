@@ -19,6 +19,7 @@ import { FollowsModule } from './follows/follows.module';
 import { Follows } from "./follows/follows.entity";
 import { ReviewsModule } from './reviews/reviews.module';
 import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
+import { BulletinModule } from './bulletin/bulletin.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
     SwimLogsModule,
     FollowsModule,
     ReviewsModule,
+    BulletinModule,
   ],
   controllers: [AppController],
   providers: [AppService],
