@@ -55,8 +55,8 @@ export class ReviewsService {
                 }),
                 page,
                 limit,
+                reviews: result
             },
-            reviews: result
         }
     }
 
