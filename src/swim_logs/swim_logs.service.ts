@@ -130,4 +130,38 @@ export class SwimLogsService {
 
     return resultUserLogs;
   }
+
+  async deleteMyLog(log_id : number, user_id : number) {
+    // 현재 삭제하려는 수영 로그가 있는지 확인하기
+    const isExistLog = await this.swimLogsRepository.findOne({
+      where : {
+        id : log_id,
+        user_id : user_id
+      }
+    });
+
+    // 만약 삭제하려는 로그가 존재하지 않는다면, 예외를 반환한다.
+    if(!isExistLog) {
+      throw new HttpException({
+        status : "error",
+        message : "해당 수영 로그는 이미 존재하지 않습니다.",
+      }, HttpStatus.NOT_FOUND)
+    }
+
+    // 삭제 결과
+    const result = await this.swimLogsRepository.delete({
+      id : log_id,
+      user_id: user_id,
+    });
+
+    // 이미 위에서 확인했지만, 데이터베이스에도 오류가 있을지 몰라 작성해놓음.
+    if(result.affected === 0) {
+      throw new HttpException({
+        status : "error",
+        message : "삭제하려는 로그가 데이터베이스에 존재하지 않습니다."
+      }, HttpStatus.NOT_FOUND);
+    }
+
+    return isExistLog;
+  }
 }

@@ -22,8 +22,8 @@ export class CoordinateApiService {
             throw new NotFoundException("주소를 찾을 수 없습니다.")
         }
 
-    const {x : longtitude, y : latitude} = response.data.documents[0].address
+    const {x : longitude, y : latitude} = response.data.documents[0].address
     
-    return {longtitude, latitude}
+    return {longitude, latitude}
     }
 }

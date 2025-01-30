@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { SwimLogs } from "../swim_logs/swim_logs.entity";
 import { Follows } from "../follows/follows.entity";
+import { Reviews } from "src/reviews/reviews.entity";
 
 @Entity()
 export class Users {
@@ -73,4 +74,7 @@ export class Users {
 
   @OneToMany(() => Follows, (follow) => follow.users)
   follows : Follows[];
+
+  @OneToMany(() => Reviews, (reviews) => reviews.users )
+  reviews : Reviews[];
 }

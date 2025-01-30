@@ -42,6 +42,9 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
             echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
             
+            # KaKao Map API 요청 연동을 위한 환경변수
+            echo "KAKAO_KEY=${{ secrets.KAKAO_KEY }}" >> .env
+            
             # DB 연동을 위한 환경변수 주입
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env # .env (IPV4)
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env # 이어붙이기 (DB 유저이름) 

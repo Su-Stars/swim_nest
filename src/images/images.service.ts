@@ -52,7 +52,8 @@ export class ImagesService {
             Bucket: this.configService.get('AWS_BUCKET_NAME'),
             Key: fullName,
             Body: buffer,
-            ContentType: `image/${ext}`
+            ContentType: `image/${ext}`,
+            ContentDisposition : "inline" // 다운로드가 아니라, 브라우저에서 표시하기 위함.
         })
 
         const result = await this.s3Client.send(command);
@@ -65,9 +66,9 @@ export class ImagesService {
                 mimetype
             }
             
-            const { identifiers } = await this.ImagesRepository.insert(data)
+            const { identifiers, generatedMaps } = await this.ImagesRepository.insert(data)
             
-            return identifiers[0].id
+            return {identifiers, data, generatedMaps}
         } else {
             throw new NotFoundException(
                 "업로드 할 사진이 없습니다."
@@ -75,6 +76,17 @@ export class ImagesService {
         }
     }
 
-    
+    async adminSaveImageUrl(urls : string[]) {
+        const imageEntities : Images[] = urls.map((url) => ({
+            url : url,
+            filename : url,
+            size : 0,
+            mimetype : "image/jpg"
+        }) as Images)
+
+        const imageEntitiesResult = await this.ImagesRepository.save(imageEntities);
+
+        return imageEntitiesResult;
+    }
 }
 

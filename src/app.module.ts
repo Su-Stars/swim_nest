@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PoolsModule } from './pools/pools.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { poolImages, Pools } from './pools/pools.entity';
+import { PoolImages, Pools } from './pools/pools.entity';
 import { Users } from "./users/users.entity";
 import { Bookmarks } from "./bookmarks/bookmarks.entity";
 import { BookmarksModule } from './bookmarks/bookmarks.module';
@@ -17,6 +17,8 @@ import { SwimLogs } from "./swim_logs/swim_logs.entity";
 import { ImagesModule } from './images/images.module';
 import { FollowsModule } from './follows/follows.module';
 import { Follows } from "./follows/follows.entity";
+import { ReviewsModule } from './reviews/reviews.module';
+import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
 
 @Module({
   imports: [
@@ -28,9 +30,12 @@ import { Follows } from "./follows/follows.entity";
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, poolImages, Follows],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords],
       synchronize: true,
       charset : "utf8mb4",
+      cache : {
+        duration : 0
+      }
     }),
     AppModule,
     UsersModule,
@@ -40,6 +45,7 @@ import { Follows } from "./follows/follows.entity";
     BookmarksModule,
     SwimLogsModule,
     FollowsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
