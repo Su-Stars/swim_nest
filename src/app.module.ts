@@ -15,8 +15,11 @@ import * as process from "node:process";
 import { Images } from './images/images.entity';
 import { SwimLogs } from "./swim_logs/swim_logs.entity";
 import { ImagesModule } from './images/images.module';
+import { FollowsModule } from './follows/follows.module';
+import { Follows } from "./follows/follows.entity";
 import { ReviewsModule } from './reviews/reviews.module';
 import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
+import { BulletinModule } from './bulletin/bulletin.module';
 
 @Module({
   imports: [
@@ -28,7 +31,7 @@ import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords, Follows],
       synchronize: true,
       charset : "utf8mb4",
       cache : {
@@ -42,7 +45,9 @@ import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
     ImagesModule,
     BookmarksModule,
     SwimLogsModule,
+    FollowsModule,
     ReviewsModule,
+    BulletinModule,
   ],
   controllers: [AppController],
   providers: [AppService],

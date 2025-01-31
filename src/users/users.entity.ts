@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { SwimLogs } from "../swim_logs/swim_logs.entity";
+import { Follows } from "../follows/follows.entity";
 import { Reviews } from "src/reviews/reviews.entity";
 
 @Entity()
@@ -71,6 +72,14 @@ export class Users {
   @OneToMany(() => SwimLogs, (swimLog) => swimLog.users )
   swimLogs : SwimLogs[];
 
-  @OneToMany(() => Reviews, (reviews) => reviews.users )
+  @OneToMany(() => Reviews, (review) => review.users)
   reviews : Reviews[];
+
+  // 내가 팔로우한 사람들 (Following)
+  @OneToMany(() => Follows, (follows) => follows.user)
+  following: Follows[];
+
+  // 나를 팔로우한 사람들 (Followers)
+  @OneToMany(() => Follows, (follows) => follows.follow_user)
+  followers: Follows[];
 }
