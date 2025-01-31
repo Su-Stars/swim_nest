@@ -20,6 +20,7 @@ import { Follows } from "./follows/follows.entity";
 import { ReviewsModule } from './reviews/reviews.module';
 import { Keyword, Review_Keywords, Reviews } from './reviews/reviews.entity';
 import { BulletinModule } from './bulletin/bulletin.module';
+import { UserImages } from "./users/user-images.entity";
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { BulletinModule } from './bulletin/bulletin.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords, Follows],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, UserImages, Reviews, Keyword, Review_Keywords, Follows],
       synchronize: true,
       charset : "utf8mb4",
       cache : {

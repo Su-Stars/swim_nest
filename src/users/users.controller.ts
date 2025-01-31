@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Patch, Query, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors
+} from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Request, Response } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
@@ -6,10 +18,14 @@ import { EditUserInfoDto } from "./dto/editUserInfo.dto";
 import { ApiBody, ApiCookieAuth } from "@nestjs/swagger";
 import { AuthService } from "../auth/auth.service";
 import { MyReviewQueryDto } from "./dto/myReviewQuery.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('api/v1/users')
 export class UsersController {
-  constructor(private readonly usersService : UsersService, private readonly authService : AuthService) {}
+  constructor(
+    private readonly usersService : UsersService,
+    private readonly authService : AuthService,
+  ) {}
 
   @Get("me/reviews")
   @ApiCookieAuth()
@@ -74,5 +90,37 @@ export class UsersController {
       message : "자기 자신 정보 가져오기 성공",
       data : result
     }
+  }
+
+  @Post("image")
+  @UseInterceptors(FileInterceptor("user-image"))
+  @ApiCookieAuth()
+  async registerMyImage(@UploadedFile() file : Express.Multer.File, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    return await this.usersService.registerMyImage(id, file);
+  }
+
+  @Delete("image")
+  @ApiCookieAuth()
+  async deleteMyImage(@Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    return await this.usersService.deleteMyImage(id);
+  }
+
+  @Patch("image")
+  @UseInterceptors(FileInterceptor("user-image"))
+  @ApiCookieAuth()
+  async patchMyImage(@UploadedFile() file : Express.Multer.File, @Req() req : Request) {
+    const jwtPayload : JwtPayload = req["user"];
+
+    const {id} = jwtPayload;
+
+    return await this.usersService.patchMyImage(id, file);
   }
 }

@@ -6,6 +6,7 @@ import {
     OneToMany, OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
+import {UserImages} from "../users/user-images.entity"
 
 @Entity()
 export class Images {
@@ -29,4 +30,7 @@ export class Images {
 
     @OneToOne(() => PoolImages, (poolImages) => poolImages.image)
     poolImage : PoolImages
+
+    @OneToOne(() => UserImages, (userImage) => userImage.image)
+    userImage : UserImages
 }

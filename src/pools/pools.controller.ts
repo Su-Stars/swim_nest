@@ -158,7 +158,7 @@ export class PoolsController {
         @UploadedFile() file: Express.Multer.File
     ) {
         if (await this.poolsService.getByIdPool(id)){
-            const imageResult: any = await this.imagesService.uploadImages(req, file, id)
+            const imageResult: any = await this.imagesService.uploadImages(file, id);
             return await this.poolsService.adminUploadImage(id, imageResult)
         }
     }

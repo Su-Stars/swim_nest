@@ -1,8 +1,18 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity, JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { SwimLogs } from "../swim_logs/swim_logs.entity";
 import { Follows } from "../follows/follows.entity";
 import { Reviews } from "src/reviews/reviews.entity";
+import { Images } from "../images/images.entity";
+import { UserImages } from "./user-images.entity";
 
 @Entity()
 export class Users {
@@ -82,4 +92,7 @@ export class Users {
   // 나를 팔로우한 사람들 (Followers)
   @OneToMany(() => Follows, (follows) => follows.follow_user)
   followers: Follows[];
+
+  @OneToOne(() => UserImages, (userImage) => userImage.user)
+  userImage : UserImages;
 }
