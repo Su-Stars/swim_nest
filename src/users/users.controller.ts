@@ -81,8 +81,6 @@ export class UsersController {
   async getMyAccount(@Req() req : Request) {
     const payload : JwtPayload = req["user"];
 
-    console.log(payload);
-
     const result = await this.usersService.getMyInfo(payload);
 
     return {

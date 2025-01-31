@@ -68,14 +68,17 @@ export class UsersService {
       },
     });
 
+
     const {password, salt, refresh_token, expiration_date,  ...result} = users;
 
-    const trimResult = {
-      ...result,
-      userImage : result.userImage.image.url
+    if(result.userImage) {
+      return {
+        ...result,
+        userImage : result.userImage.image.url
+      }
+    } else {
+      return result;
     }
-
-    return trimResult;
   }
 
   async editMyInfo(id : number, editInfo : EditUserInfoDto) {

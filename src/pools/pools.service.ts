@@ -247,7 +247,7 @@ export class PoolsService {
 
         return {
             status: "success",
-            message: "조건식 수영장 목록 조회 성공",
+            message: "조건에 맞는 수영장 목록 조회 성공",
             data: {
                 total: totalNumber,
                 page,
