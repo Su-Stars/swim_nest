@@ -164,7 +164,7 @@ export class PoolsController {
     }
 
     // 리뷰 조회
-    @Get('reviews/:poolId')
+    @Get(':poolId/reviews')
     @HttpCode(200)
     async getAllPoolsReviews (
         @Param('poolId') poolId: number,
@@ -174,7 +174,7 @@ export class PoolsController {
     }
 
     // 리뷰 추가
-    @Post('reviews/:poolId')
+    @Post(':poolId/reviews')
     @HttpCode(200)
     async addPoolsReviews (
         @Param('poolId') poolId: number,
@@ -185,7 +185,7 @@ export class PoolsController {
     }
 
     // 리뷰 수정
-    @Patch('reviews/:poolId/:reviewId')
+    @Patch(':poolId/reviews/:reviewId')
     @HttpCode(200)
     async updatePoolsReviews (
         @Param('poolId') poolId: number,
@@ -197,7 +197,7 @@ export class PoolsController {
     }
 
     // 리뷰 삭제
-    @Delete('reviews/:poolId/:reviewId')
+    @Delete(':poolId/reviews/:reviewId')
     @HttpCode(200)
     async deletePoolsReviews (
         @Param('poolId') poolId: number,
