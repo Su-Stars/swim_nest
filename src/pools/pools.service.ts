@@ -170,26 +170,28 @@ export class PoolsService {
         // region 혹은 keyword 가 비어있지 않은 경우.
         let addressTokens : string[] = [];
 
-        // 받아온 지역 정보의 문자열 앞뒤 빈 문자열을 지우고, 빈 칸으로 나눈다.
-        addressTokens = region.trim().split(" ");
-
-        // 이건 오류 예방인데, 지역 간 띄어쓰기가 2칸, 3칸일 때를 대비.
-        addressTokens = addressTokens.map((token) => {
-            // "경기도 " 이런 식으로 나뉘어 졌다면, "경기도" 로 만들어주는 작업.
-            return token.trim();
-        })
-
         let addressSearch= "%";
 
-        // "%서울%서초%" 이러한 형식으로 구성 - LIKE 사용할 것이므로
-        for(let token of addressTokens) {
-            addressSearch += (token + "%");
-        }
 
         const whereOption :  FindOptionsWhere<Pools> | FindOptionsWhere<Pools>[] = {}
 
         // 지역 검색 문자열이 존재했다면
         if(region){
+            // 받아온 지역 정보의 문자열 앞뒤 빈 문자열을 지우고, 빈 칸으로 나눈다.
+            addressTokens = region.trim().split(" ");
+
+            // 이건 오류 예방인데, 지역 간 띄어쓰기가 2칸, 3칸일 때를 대비.
+            addressTokens = addressTokens.map((token) => {
+                // "경기도 " 이런 식으로 나뉘어 졌다면, "경기도" 로 만들어주는 작업.
+                return token.trim();
+            })
+
+
+            // "%서울%서초%" 이러한 형식으로 구성 - LIKE 사용할 것이므로
+            for(let token of addressTokens) {
+                addressSearch += (token + "%");
+            }
+
             whereOption.address = Like(addressSearch)
         }
 

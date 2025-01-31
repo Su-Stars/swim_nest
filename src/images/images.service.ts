@@ -1,5 +1,11 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { ForbiddenException, Injectable, NotFoundException, UnsupportedMediaTypeException } from '@nestjs/common';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+    ForbiddenException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+    UnsupportedMediaTypeException
+} from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import { Repository } from 'typeorm';
@@ -26,18 +32,11 @@ export class ImagesService {
         })
     }
 
+    // 업로드 해야 할 파일, 해당되는 id 로 구성된다.
     async uploadImages (
-        req: Request,
         file: Express.Multer.File,
         id: number
     ) {
-        const {role} : JwtPayload = req["user"]
-
-        if (role === 'user') {
-                    throw new ForbiddenException({
-                        message: "권한이 존재하지 않습니다."
-                    })
-                }
 
         const { size, mimetype, buffer, fieldname } = file;
         const type = ['image/png', 'image/jpeg', 'image/gif']
@@ -73,6 +72,36 @@ export class ImagesService {
             throw new NotFoundException(
                 "업로드 할 사진이 없습니다."
             )
+        }
+    }
+
+    async deleteImage(image_id : number) {
+        const {url, filename} = await this.ImagesRepository.findOne({
+            where : {
+                id : image_id
+            }
+        });
+
+        const deleteCommand = new DeleteObjectCommand({
+            Bucket: this.configService.get('AWS_BUCKET_NAME'),
+            Key: filename,
+        });
+
+        const result = await this.s3Client.send(deleteCommand);
+
+        const resultStatusCode = result.$metadata.httpStatusCode;
+
+        // 정상적인 처리
+        if(resultStatusCode >= 200 && resultStatusCode < 300) {
+            // 나의 이미지 경로 저장 테이블에서 삭제.
+            await this.ImagesRepository.delete({
+                id : image_id
+            })
+
+            return true;
+        } else {
+            // 실패함.
+            return false;
         }
     }
 

@@ -6,11 +6,14 @@ import { Users } from "./users.entity";
 import { AuthModule } from "../auth/auth.module";
 import { AuthMiddleware } from "../common/middleware/auth.middleware";
 import { AuthService } from "../auth/auth.service";
+import { ImagesModule } from "../images/images.module";
+import { UserImages } from "./user-images.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([UserImages, Users]),
     forwardRef(() => AuthModule),
+    ImagesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],
