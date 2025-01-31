@@ -8,6 +8,6 @@ import { SwimLogs } from "../swim_logs/swim_logs.entity";
   imports : [TypeOrmModule.forFeature([SwimLogs])],
   providers: [BulletinService],
   controllers: [BulletinController],
-  exports : [BulletinService]
+  exports : [BulletinService, TypeOrmModule]
 })
 export class BulletinModule {}

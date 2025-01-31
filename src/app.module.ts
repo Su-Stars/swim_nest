@@ -31,7 +31,7 @@ import { BulletinModule } from './bulletin/bulletin.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords],
+      entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, Reviews, Keyword, Review_Keywords, Follows],
       synchronize: true,
       charset : "utf8mb4",
       cache : {

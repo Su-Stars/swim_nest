@@ -24,6 +24,21 @@ export class BulletinService {
       }
     })
 
+    const logsRecord = logs.map((log) => {
+      const users = log.users
+
+      return {
+        ...log,
+        users : {
+          id : users.id,
+          nickname : users.nickname,
+          role : users.role
+        }
+      }
+    })
+
+
+
     // 단 하나의 유저 기록도 존재하지 않는다면 - 그럴 일은 거의 없을듯. (테이블을 DROP 하지 않는 이상.)
     if(logs.length === 0) {
       throw new HttpException({
@@ -32,6 +47,8 @@ export class BulletinService {
       }, HttpStatus.NOT_FOUND);
     }
 
+
+
     return {
       status : "success",
       message : "오수완 조회 성공",
@@ -39,7 +56,7 @@ export class BulletinService {
         totalCount : count,
         page : page,
         limit : limit,
-        record : logs
+        record : logsRecord
       }
     }
   }

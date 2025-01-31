@@ -13,7 +13,7 @@ export class Follows {
   @Column()
   user_id: number;
 
-  // ✅ 팔로우 당하는 사람 (팔로우 대상)
+  // 팔로우 당하는 사람 (팔로우 대상)
   @ManyToOne(() => Users, (user) => user.followers)
   @JoinColumn({ name: "follow_id" })
   follow_user: Users;

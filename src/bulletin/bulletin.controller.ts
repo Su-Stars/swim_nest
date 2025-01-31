@@ -9,6 +9,6 @@ export class BulletinController {
 
   @Get()
   async getAllBulletin(@Query() query : GetAllBulletinDto) {
-    return await this.bulletinService
+    return await this.bulletinService.getAllBulletin(query);
   }
 }
