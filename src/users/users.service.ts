@@ -131,6 +131,19 @@ export class UsersService {
   }
 
   async registerMyImage(id : number, file : Express.Multer.File) {
+    const isAlreadyExist = await this.userImagesRepository.exists({
+      where : {
+        user_id : id
+      }
+    })
+
+    if(isAlreadyExist) {
+      throw new HttpException({
+        status : "fail",
+        message : "사용자 이미지를 이미 등록하셨습니다."
+      }, HttpStatus.BAD_REQUEST);
+    }
+
     // 파일을 업로드 할 때, 파일의 이름과 id 를 조합하여 url 을 생성함.
     // 반환값으로는, 입력된 images 레이블의 PK 를 반환한다. - identifiers
     const {identifiers} = await this.imagesService.uploadImages(file, id);

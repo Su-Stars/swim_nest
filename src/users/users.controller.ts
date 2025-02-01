@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpException, HttpStatus,
   Patch,
   Post,
   Query,
@@ -15,7 +15,7 @@ import { UsersService } from "./users.service";
 import { Request, Response } from "express";
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { EditUserInfoDto } from "./dto/editUserInfo.dto";
-import { ApiBody, ApiCookieAuth } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes, ApiCookieAuth } from "@nestjs/swagger";
 import { AuthService } from "../auth/auth.service";
 import { MyReviewQueryDto } from "./dto/myReviewQuery.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -93,7 +93,22 @@ export class UsersController {
   @Post("image")
   @UseInterceptors(FileInterceptor("user-image"))
   @ApiCookieAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema : {
+      type : "object",
+      properties : {
+        "user-image" : {
+          type : "string",
+          format : "binary"
+        }
+      }
+    }
+  })
   async registerMyImage(@UploadedFile() file : Express.Multer.File, @Req() req : Request) {
+    // 만약 실수로 이미지 파일이 등록되지 않았을 경우를 상정한다.
+    await this.isExistFile(file);
+
     const jwtPayload : JwtPayload = req["user"];
 
     const {id} = jwtPayload;
@@ -114,11 +129,35 @@ export class UsersController {
   @Patch("image")
   @UseInterceptors(FileInterceptor("user-image"))
   @ApiCookieAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema : {
+      type : "object",
+      properties : {
+        "user-image" : {
+          type : "string",
+          format : "binary"
+        }
+      }
+    }
+  })
   async patchMyImage(@UploadedFile() file : Express.Multer.File, @Req() req : Request) {
+    // 만약 실수로 이미지 파일이 등록되지 않았을 경우를 상정한다.
+    await this.isExistFile(file);
+
     const jwtPayload : JwtPayload = req["user"];
 
     const {id} = jwtPayload;
 
     return await this.usersService.patchMyImage(id, file);
+  }
+
+  private async isExistFile(file : Express.Multer.File) {
+    if(!file) {
+      throw new HttpException({
+        status : "error",
+        message : "이미지 파일을 누락하셨습니다."
+      }, HttpStatus.NOT_ACCEPTABLE)
+    }
   }
 }
