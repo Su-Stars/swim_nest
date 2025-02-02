@@ -70,7 +70,7 @@ export class ReviewsService {
                 }),
                 page,
                 limit,
-                reviews: result ? [] : result
+                reviews: result.length === 0 ? [] : result
             },
         }
     }
