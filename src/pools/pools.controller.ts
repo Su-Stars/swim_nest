@@ -157,6 +157,13 @@ export class PoolsController {
         @Param('poolId', ParseIntPipe) id: number,
         @UploadedFile() file: Express.Multer.File
     ) {
+        if(!file){
+            throw new HttpException({
+                status : "error",
+                message : "파일이 첨부되지 않았습니다."
+            }, HttpStatus.NOT_ACCEPTABLE);
+        }
+
         if (await this.poolsService.getByIdPool(id)){
             const imageResult: any = await this.imagesService.uploadImages(file, id);
             return await this.poolsService.adminUploadImage(id, imageResult)

@@ -19,10 +19,6 @@ export class createPool {
 
     @IsOptional()
     @IsString()
-    images: string;
-
-    @IsOptional()
-    @IsString()
     freeSwimLink: string;
 
     @IsOptional()
