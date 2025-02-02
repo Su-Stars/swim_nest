@@ -52,6 +52,12 @@ jobs:
             echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env # mysql2
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env # 3306
             echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env # swim_nest
+            
+            # nodemailer 사용하기 위한 계정
+            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
+            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+            
+            
             git reset --hard HEAD
             git pull --ff-only origin main
             pm2 kill
