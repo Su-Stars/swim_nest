@@ -307,7 +307,8 @@ export class PoolsService {
 
         if (role === 'user') {
             throw new ForbiddenException({
-                message: "권한이 존재하지 않습니다."
+                status : "fail",
+                message: "일반 유저는 수영장을 등록할 수 없습니다."
             })
         } else if (role === 'admin') {
             const { identifiers } = await this.PoolsRepository.insert({...body, longitude : longitude, latitude});
@@ -326,7 +327,8 @@ export class PoolsService {
 
         if (role === 'user') {
             throw new ForbiddenException({
-                message: "권한이 존재하지 않습니다."
+                status : "fail",
+                message: "일반 유저는 수영장 정보를 수정 할 수 없습니다."
             })
         }
 
@@ -363,12 +365,16 @@ export class PoolsService {
 
         if (role === 'user') {
             throw new ForbiddenException({
-                message: "권한이 존재하지 않습니다."
+                status : "fail",
+                message: "일반 유저는 수영장을 삭제할 수 없습니다."
             })
         } else if (role === 'admin') {
             const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0){
-                throw new NotFoundException();
+                throw new HttpException({
+                    status : "error",
+                    message : "삭제하려는 수영장이 존재하지 않습니다."
+                }, HttpStatus.NOT_FOUND);
             }
 
             await this.PoolsRepository.delete({id: poolId})
