@@ -332,7 +332,10 @@ export class PoolsService {
 
         const checkPool = await this.PoolsRepository.find({where : {id: poolId}})
             if (checkPool.length === 0) {
-                throw new NotFoundException();
+                throw new HttpException({
+                    status : "error",
+                    message : "수정하려는 수영장이 존재하지 않습니다."
+                }, HttpStatus.NOT_FOUND);
             }
 
 

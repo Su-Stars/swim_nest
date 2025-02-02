@@ -17,7 +17,6 @@ export class updatePool {
         @IsString()
         website: string;
     
-
         @IsOptional()
         @IsString()
         freeSwimLink: string;
@@ -57,10 +56,11 @@ export class updatePool {
         @IsOptional()
         @IsBoolean()
         isDivingAllowed: boolean;
-    
+
         @IsOptional()
         @IsBoolean()
-
+        isPhotoAllowed: boolean;
+    
         @IsOptional()
         @IsString()
         description: string;
