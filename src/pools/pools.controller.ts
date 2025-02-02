@@ -119,7 +119,7 @@ export class PoolsController {
     // 로그인이 되어 있는 상태에서, 해당 수영장이 내가 북마크 한 수영장인지 확인하여 반환한다.
     @Get(":pool_id/bookmark")
     @HttpCode(HttpStatus.OK)
-    async isBookmarked(@Param("poolId", ParseIntPipe) poolId : number, @Req() req : Request) {
+    async isBookmarked(@Param("pool_id", ParseIntPipe) poolId : number, @Req() req : Request) {
         const jwtPayload : JwtPayload = req["user"];
 
         const {id} = jwtPayload;
