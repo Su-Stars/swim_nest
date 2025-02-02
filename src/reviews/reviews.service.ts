@@ -1,4 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException
+} from "@nestjs/common";
 import { Keyword, Review_Keywords, Reviews } from './reviews.entity';
 import {  In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,7 +38,18 @@ export class ReviewsService {
         query: GetQueryData,
     ) {
         const {limit, page} = query;
-        
+
+        const pool = await this.PoolsRepository.findOneBy({
+            id : poolId
+        })
+
+        if(!pool) {
+            throw new HttpException({
+                status : "error",
+                message : "존재하지 않는 수영장은 리뷰를 조회할 수 없습니다."
+            }, HttpStatus.NOT_FOUND);
+        }
+
         const result = await this.ReviewsRepository
         .createQueryBuilder('Reviews')
         .leftJoin('Reviews.users', 'Users')
@@ -40,10 +58,6 @@ export class ReviewsService {
         .take(limit)
         .skip((page-1) * limit)
         .getMany();
-        
-        if (result.length === 0) {
-            throw new NotFoundException
-        }
 
         return {
             status: "success",
@@ -56,7 +70,7 @@ export class ReviewsService {
                 }),
                 page,
                 limit,
-                reviews: result
+                reviews: result ? [] : result
             },
         }
     }
