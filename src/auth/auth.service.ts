@@ -73,8 +73,15 @@ export class AuthService {
     const {email, password} = loginDto;
 
     // email 로 레코드 찾기
-    const loginUsers = await this.usersRepository.findOneBy({
-      email : email,
+    const loginUsers = await this.usersRepository.findOne({
+      where : {
+        email : email
+      },
+      relations : {
+        userImage : {
+          image : true
+        }
+      }
     });
 
     // 만약 이메일이 존재하지 않을 경우 바로 에러 던지기.
@@ -102,7 +109,8 @@ export class AuthService {
       id : loginUsers.id,
       email : email,
       nickname : loginUsers.nickname,
-      role : loginUsers.role
+      role : loginUsers.role,
+      
     }
 
     const {accessToken, refreshToken} = await this.generateAllTokens(result);
