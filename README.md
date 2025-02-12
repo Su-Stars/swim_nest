@@ -56,75 +56,74 @@
 
 **Users 도메인**
 
-`/api/v1/users` :
+`/api/v1/users` : (유저 도메인)
 
-* `GET me`
-* `DELETE me`
-* `PATCH me`
-* `GET me/reviews`
-* `POST image`
-* `DELETE image`
-* `PATCH image`
+* `GET me` - 사용자는 자신의 정보를 조회할 수 있다.
+* `DELETE me` - 사용자는 자신의 정보를 사이트에서 삭제하고, 로그아웃 할 수 있다.
+* `PATCH me` - 사용자는 자신의 정보를 수정 할 수 있다.
+* `GET me/reviews` - 사용자는 자신이 수영장을 리뷰한 기록을 조회할 수 있다.
+* `POST image` - 사용자는 자신의 Profile 을 등록 할 수 있다.
+* `DELETE image` - 사용자는 자신의 Profile 을 삭제 할 수 있다.
+* `PATCH image` - 사용자는 자신의 Profile 을 수정 할 수 있다.
 
 **Auth 도메인**
 
-`/api/v1/auth` :
+`/api/v1/auth` : (보안 도메인)
 
-* `POST login`
-* `POST logout`
-* `POST refresh-token`
-* `POST register`
-* `POST reset-password`
-* `POST email-verification`
+* `POST login` - 사이트에 로그인 할 수 있다. (Access, Refresh 토큰을 쿠키에 저장)
+* `POST logout` - 사이트에서 로그아웃 할 수 있다. (쿠키에서 Access, Refresh 토큰을 삭제)
+* `POST register` - 사이트에 회원가입 할 수 있다.
+* `POST reset-password` - 자신의 비밀번호를 수정 할 수 있다.
+* `POST email-verification` - 이미 이메일이 등록되어 있는지 확인 할 수 있다.
 
 **Pools 도메인**
 
-`api/v1/pools` :
+`api/v1/pools` : (수영장 정보 도메인)
 
-* `GET /`
-* `POST /`
-* `GET :poolId`
-* `PATCH :poolId`
-* `DELETE :poolId`
-* `POST images/:poolId`
-* `PUT images/:pool_id`
-* `GET :poolId/reviews`
-* `POST :poolId/reviews`
-* `PATCH :poolId/reviews/:reviewId`
-* `DELETE :poolId/reviews/:reviewId`
-* `POST :pool_id/bookmark`
-* `DELETE :pool_id/bookmark`
-* `GET :pool_id/bookmark`
+* `GET /` - 키워드, 지역 두 변수를 기준으로 원하는 수영장 리스트를 가져온다. (Default : `page` : 1, `limit` : 10)
+* `POST /` - 수영장 정보를 등록 할 수 있다.
+* `GET :poolId` - 해당 수영장 ID 정보를 가져올 수 있다.
+* `PATCH :poolId` - 관리자는 해당 수영장 정보를 변경할 수 있다.
+* `DELETE :poolId` - 관리자는 해당 수영장을 삭제할 수 있다.
+* `POST images/:poolId` - 관리자는 해당 수영장의 이미지를 등록할 수 있다.
+* `PUT images/:pool_id` - 관리자는 해당 수영장의 이미지를 추가할 수 있다.
+* `GET :poolId/reviews` - 해당 수영장에 등록된 리뷰를 가져올 수 있다.
+* `POST :poolId/reviews` - 사용자는 해당 수영장에 리뷰를 등록할 수 있다.
+* `PATCH :poolId/reviews/:reviewId` - 사용자는 해당 수영장에 등록한 리뷰를 수정할 수 있다.
+* `DELETE :poolId/reviews/:reviewId` - 사용자는 해당 수영장에 등록한 리뷰를 삭제 할 수 있다.
+* `POST :pool_id/bookmark` - 사용자는 해당 수영장을 북마크(즐겨찾기) 할 수 있다.
+* `DELETE :pool_id/bookmark` - 사용자는 자신이 북마크 한 수영장을 다시 북마크 취소 할 수 있다.
+* `GET :pool_id/bookmark` - 사용자는 자신이 해당 수영장을 북마크했는지 확인 할 수 있다.
 
 **Reviews 도메인**
 
-`api/v1/reviews` :
+`api/v1/reviews` : (관리자 리뷰 조회 도메인)
 
-* `GET /`
+* `GET /` - 관리자는 수영장에 등록되었던 모든 리뷰를 최신 순으로 볼 수 있다.
 
 **Bookmarks 도메인**
 
-`api/v1/bookmarks` :
+`api/v1/bookmarks` : (수영장 북마크 도메인)
 
-* `POST /`
-* `GET /`
-* `DELETE :bookmark_id`
+* `POST /` - 사용자는 body 값에 담겨진 수영장 id 를 북마크한다.
+* `GET /` - 사용자는 해당 북마크 id 에 해당하는 수영장 정보를 가져온다.
+* `DELETE :bookmark_id` - 사용자는 해당 북마크 id 레코드를 삭제한다. (즐겨찾기 취소)
 
 **SwimLogs 도메인**
 
-`api/v1/logs` :
+`api/v1/logs` : (사용자 스스로의 수영 기록 도메인)
 
-* `POST /`
-* `GET /`
-* `GET user-logs`
-* `GET :log_id`
-* `DELETE :log_id`
+* `POST /` - 사용자는 자신이 수행한 수영 기록을 등록 할 수 있다.
+* `GET /` - 사용자는 쿼리로 주어지는 시간에 따라 기록을 내림차순으로 제공한다.
+* `GET user-logs` - 관리자는 모든 사용자에 대해 기록된 운동 기록을 최신 순으로 조회 할 수 있다.
+* `GET :log_id` - 사용자는 자신의 해당 수영 기록에 대한 정보를 모두 조회할 수 있다.
+* `DELETE :log_id` - 사용자는 자신의 해당 수영 기록을 삭제 할 수 있다.
 
 **Bulletin 도메인**
 
 `api/v1/bulletin` :
 
-`GET /`
+`GET /` : 사이트에 접속한 사람들은 현재 사용자들이 기록한 수영 기록을 간략하게 20 개를 볼 수 있다.
 
 
 ## 3. 역할 분담
