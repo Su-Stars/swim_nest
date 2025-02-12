@@ -27,7 +27,7 @@ import { UserImages } from "./users/user-images.entity";
     ConfigModule.forRoot({isGlobal : true}),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as "mysql",
-      host: process.env.DB_HOST,
+      host: process.env.NODE_ENV === "development" ? "localhost:3306" : process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
