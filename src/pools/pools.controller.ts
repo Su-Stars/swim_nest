@@ -25,13 +25,13 @@ import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
 import { updatePool } from './dto/updatePool.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImagesService } from 'src/images/images.service';
+import { ImagesService } from '../images/images.service';
 import { JwtPayload } from "../auth/dto/jwt-payload";
 import { BookmarksService } from "../bookmarks/bookmarks.service";
 import { ImageUrls } from "./dto/image-urls.dto";
-import { createReviews } from "src/reviews/dto/createReviews.dto";
-import { ReviewsService } from "src/reviews/reviews.service";
-import { updateReviews } from "src/reviews/dto/updateReviews.dto";
+import { createReviews } from "../reviews/dto/createReviews.dto";
+import { ReviewsService } from "../reviews/reviews.service";
+import { updateReviews } from "../reviews/dto/updateReviews.dto";
 
 
 @Controller('api/v1/pools')

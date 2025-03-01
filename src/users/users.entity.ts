@@ -10,8 +10,7 @@ import {
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { SwimLogs } from "../swim_logs/swim_logs.entity";
 import { Follows } from "../follows/follows.entity";
-import { Reviews } from "src/reviews/reviews.entity";
-import { Images } from "../images/images.entity";
+import { Reviews } from "../reviews/reviews.entity";
 import { UserImages } from "./user-images.entity";
 
 @Entity()

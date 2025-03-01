@@ -27,17 +27,16 @@ import { UserImages } from "./users/user-images.entity";
     ConfigModule.forRoot({isGlobal : true}),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as "mysql",
-      host: process.env.NODE_ENV === "development" ? "localhost:3306" : process.env.DB_HOST,
+      host: process.env.NODE_ENV === "development" ? "localhost" : process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
+      username: process.env.NODE_ENV === "development" ? "root" : process.env.DB_USERNAME,
+      password: process.env.NODE_ENV === "development" ? "root" : process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [Pools, Users, Images, Bookmarks, SwimLogs, PoolImages, UserImages, Reviews, Keyword, Review_Keywords, Follows],
       synchronize: true,
       charset : "utf8mb4",
-      cache : {
-        duration : 0
-      }
+      // e2e 테스팅용
+      dropSchema : true,
     }),
     AppModule,
     UsersModule,
@@ -52,5 +51,6 @@ import { UserImages } from "./users/user-images.entity";
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports : [AppModule],
 })
 export class AppModule {}
