@@ -1,7 +1,7 @@
 name: main branch auto ci process script - 메인 브랜치로 CI/CD 하는 스크립트
 
-on:
-  push:
+# on:
+  # push:
     # branches: [main]
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{secrets.REMOTE_SECRET_KEY}}
         run: |
           echo "${SSH_PRIVATE_KEY}" > private_key.pem
-          chmod 600 private_key.pem 
+          chmod 600 private_key.pem
           cat private_key.pem
 
       - name: remote ssh 명령 실행 and .env 환경설정 파일 생성
