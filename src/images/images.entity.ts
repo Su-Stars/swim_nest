@@ -1,4 +1,4 @@
-import { PoolImages } from "src/pools/pools.entity";
+import { PoolImages } from "../pools/pools.entity";
 import {
     Column,
     CreateDateColumn,

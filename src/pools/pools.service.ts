@@ -12,12 +12,11 @@ import { FindOperator, FindOptionsWhere, In, Like, Repository } from "typeorm";
 import { GetQueryData } from './dto/get-query-data.dto';
 import { createPool } from './dto/createPool.dto';
 import { Request } from 'express';
-import { JwtPayload } from 'src/auth/dto/jwt-payload';
+import { JwtPayload } from '../auth/dto/jwt-payload';
 import { BookmarksService } from "../bookmarks/bookmarks.service";
-import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
+import { CoordinateApiService } from '../coordinate-api/coordinate-api.service';
 import { updatePool } from './dto/updatePool.dto';
 import { AuthService } from "../auth/auth.service";
-import { Bookmarks } from "../bookmarks/bookmarks.entity";
 import { Images } from "../images/images.entity";
 import { ImagesService } from "../images/images.service";
 

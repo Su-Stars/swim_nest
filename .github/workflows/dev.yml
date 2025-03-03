@@ -2,7 +2,7 @@ name: main branch auto ci process script - 메인 브랜치로 CI/CD 하는 스�
 
 on:
   push:
-    branches: [main]
+    # branches: [main]
 
 jobs:
   deploy:

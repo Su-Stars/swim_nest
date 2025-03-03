@@ -1,5 +1,5 @@
-import { Pools } from "src/pools/pools.entity";
-import { Users } from "src/users/users.entity";
+import { Pools } from "../pools/pools.entity";
+import { Users } from "../users/users.entity";
 import {
      BeforeUpdate,
      Column,

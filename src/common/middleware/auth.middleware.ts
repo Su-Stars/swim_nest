@@ -49,7 +49,7 @@ export class AuthMiddleware implements NestMiddleware {
       res.cookie("access_token", newAccessToken.accessToken, {
         httpOnly : true,
         sameSite : "none",
-        secure : true,
+        secure : process.env.NODE_ENV === 'production',
         maxAge : 5 * 60 * 1000, // 5 분
       });
 

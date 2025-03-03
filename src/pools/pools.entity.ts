@@ -10,8 +10,8 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import { Bookmarks } from "../bookmarks/bookmarks.entity";
-import { Images } from "src/images/images.entity";
-import { Reviews } from "src/reviews/reviews.entity";
+import { Images } from "../images/images.entity";
+import { Reviews } from "../reviews/reviews.entity";
 
 @Entity()
 @Index("FT_search", ['name', 'address'], {fulltext: true})

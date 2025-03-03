@@ -173,7 +173,7 @@ export class AuthService {
     response.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       sameSite : "none",
-      secure : true,
+      secure : process.env.NODE_ENV === 'production',
       maxAge: 5 * 60 * 1000, // 5 분
     });
 
@@ -182,7 +182,7 @@ export class AuthService {
       response.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
         sameSite : "none",
-        secure : true,
+        secure : process.env.NODE_ENV === 'production',
         maxAge: 1 * 24 * 60 * 60 * 1000, // 하루
       });
 

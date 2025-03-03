@@ -9,11 +9,11 @@ import {
 import { Keyword, Review_Keywords, Reviews } from './reviews.entity';
 import {  In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GetQueryData } from 'src/pools/dto/get-query-data.dto';
+import { GetQueryData } from '../pools/dto/get-query-data.dto';
 import { createReviews } from './dto/createReviews.dto';
-import { JwtPayload } from 'src/auth/dto/jwt-payload';
+import { JwtPayload } from '../auth/dto/jwt-payload';
 import { Request } from 'express';
-import { Pools } from 'src/pools/pools.entity';
+import { Pools } from '../pools/pools.entity';
 import { updateReviews } from './dto/updateReviews.dto';
 import { GetReviewQueryDto } from "./dto/getReviewQuery.dto";
 

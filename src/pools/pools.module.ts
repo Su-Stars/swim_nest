@@ -9,15 +9,15 @@ import { PoolsController } from './pools.controller';
 import { PoolsService } from './pools.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PoolImages, Pools } from './pools.entity';
-import { CoordinateApiService } from 'src/coordinate-api/coordinate-api.service';
+import { CoordinateApiService } from '../coordinate-api/coordinate-api.service';
 import { HttpModule } from '@nestjs/axios';
-import { AuthMiddleware } from 'src/common/middleware/auth.middleware';
-import { AuthModule } from 'src/auth/auth.module';
-import { ImagesModule } from 'src/images/images.module';
-import { ImagesService } from 'src/images/images.service';
+import { AuthMiddleware } from '../common/middleware/auth.middleware';
+import { AuthModule } from '../auth/auth.module';
+import { ImagesModule } from '../images/images.module';
+import { ImagesService } from '../images/images.service';
 import { BookmarksModule } from '../bookmarks/bookmarks.module';
-import { ReviewsModule } from "src/reviews/reviews.module";
-import { ReviewsService } from "src/reviews/reviews.service";
+import { ReviewsModule } from "../reviews/reviews.module";
+import { ReviewsService } from "../reviews/reviews.service";
 
 @Module({
   imports: [
