@@ -4,63 +4,63 @@ name: main branch auto ci process script - 메인 브랜치로 CI/CD 하는 스�
   # push:
     # branches: [main]
 
-jobs:
-  deploy:
-    name: deploy
-    runs-on: ubuntu-latest # 깃허브 액션 환경
-    environment: REMOTE_SECRET_KEY # Environments 의 이름 지정
-
-    steps:
-      - name: SSH Private Key 사용하기 위해 .pem 파일 만들기
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.REMOTE_SECRET_KEY}}
-        run: |
-          echo "${SSH_PRIVATE_KEY}" > private_key.pem
-          chmod 600 private_key.pem
-          cat private_key.pem
-
-      - name: remote ssh 명령 실행 and .env 환경설정 파일 생성
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
-        with:
-          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
-          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-          key: ${{secrets.REMOTE_SECRET_KEY}} # ec2 instance pem key
-          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
-          script: | # 실행할 스크립트
-            cd /home/ec2-user/Swim_Nest # Project 로 이동
-            
-            # JWT 시크릿
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
-            echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env
-            
-            # SALT 라운드 횟수
-            echo "SALT_ROUND=${{ secrets.SALT_ROUND }}" >> .env
-            
-            # AWS_S3 버킷 연동을 위한 환경변수
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
-            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
-            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
-            
-            # KaKao Map API 요청 연동을 위한 환경변수
-            echo "KAKAO_KEY=${{ secrets.KAKAO_KEY }}" >> .env
-            
-            # DB 연동을 위한 환경변수 주입
-            echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env # .env (IPV4)
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env # 이어붙이기 (DB 유저이름) 
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env # 이어붙이기  (이 유저의 비밀번호 - 이걸 안바꾸면 털립니다)
-            echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env # mysql2
-            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env # 3306
-            echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env # swim_nest
-            
-            # nodemailer 사용하기 위한 계정
-            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
-            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
-            
-            
-            git reset --hard HEAD
-            git pull --ff-only origin main
-            pm2 kill
-            npm i --legacy-peer-deps  
-            npm run build
-            pm2 start dist/main.js
+#jobs:
+#  deploy:
+#    name: deploy
+#    runs-on: ubuntu-latest # 깃허브 액션 환경
+#    environment: REMOTE_SECRET_KEY # Environments 의 이름 지정
+#
+#    steps:
+#      - name: SSH Private Key 사용하기 위해 .pem 파일 만들기
+#        env:
+#          SSH_PRIVATE_KEY: ${{secrets.REMOTE_SECRET_KEY}}
+#        run: |
+#          echo "${SSH_PRIVATE_KEY}" > private_key.pem
+#          chmod 600 private_key.pem
+#          cat private_key.pem
+#
+#      - name: remote ssh 명령 실행 and .env 환경설정 파일 생성
+#        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
+#        with:
+#          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+#          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+#          key: ${{secrets.REMOTE_SECRET_KEY}} # ec2 instance pem key
+#          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+#          script: | # 실행할 스크립트
+#            cd /home/ec2-user/Swim_Nest # Project 로 이동
+#
+#            # JWT 시크릿
+#            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+#            echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env
+#
+#            # SALT 라운드 횟수
+#            echo "SALT_ROUND=${{ secrets.SALT_ROUND }}" >> .env
+#
+#            # AWS_S3 버킷 연동을 위한 환경변수
+#            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+#            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+#            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+#            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
+#
+#            # KaKao Map API 요청 연동을 위한 환경변수
+#            echo "KAKAO_KEY=${{ secrets.KAKAO_KEY }}" >> .env
+#
+#            # DB 연동을 위한 환경변수 주입
+#            echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env # .env (IPV4)
+#            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env # 이어붙이기 (DB 유저이름)
+#            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env # 이어붙이기  (이 유저의 비밀번호 - 이걸 안바꾸면 털립니다)
+#            echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env # mysql2
+#            echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env # 3306
+#            echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env # swim_nest
+#
+#            # nodemailer 사용하기 위한 계정
+#            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
+#            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+#
+#
+#            git reset --hard HEAD
+#            git pull --ff-only origin main
+#            pm2 kill
+#            npm i --legacy-peer-deps
+#            npm run build
+#            pm2 start dist/main.js
